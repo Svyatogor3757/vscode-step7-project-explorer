@@ -1,0 +1,12 @@
+Examples/
+S-15/
+S15-2026/
+node_modules/
+dist/
+backend/obj/
+backend/bin/
+*.vsix
+.step7project/
+*.binlog
+.scratch/
+debug.log

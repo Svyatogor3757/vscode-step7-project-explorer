@@ -1,0 +1,288 @@
+{
+  "name": "step7project",
+  "displayName": "Step7Project",
+  "description": "STEP 7 Classic project browser and AI-friendly offline editor for Windows.",
+  "version": "0.1.0",
+  "publisher": "step7project",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.95.0",
+    "node": ">=20"
+  },
+  "categories": [
+    "Other",
+    "Programming Languages"
+  ],
+  "main": "./dist/extension.js",
+  "extensionKind": [
+    "workspace"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false
+    },
+    "virtualWorkspaces": false
+  },
+  "activationEvents": [
+    "workspaceContains:**/*.s7p",
+    "workspaceContains:**/step7project.json"
+  ],
+  "bin": {
+    "step7project": "./bin/step7project.cjs"
+  },
+  "scripts": {
+    "compile": "tsc -p .",
+    "build:backend": "dotnet build backend/Step7Bridge.csproj -c Release -o backend/bin",
+    "test": "npm run compile && node --test test/*.test.cjs",
+    "package": "vsce package --no-dependencies --allow-missing-repository --no-rewrite-relative-links",
+    "vscode:prepublish": "npm run build:backend && npm run compile",
+    "test:vscode": "npm run compile && node tools/test-vscode.cjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.95.0",
+    "typescript": "^5.7.0",
+    "@vscode/vsce": "^3.7.0"
+  },
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "step7project",
+          "title": "Step7Project",
+          "icon": "media/step7.svg"
+        }
+      ]
+    },
+    "views": {
+      "step7project": [
+        {
+          "id": "step7project.tree",
+          "name": "Projects"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "step7project.open",
+        "title": "Step7Project: Open STEP 7 Project"
+      },
+      {
+        "command": "step7project.refresh",
+        "title": "Step7Project: Refresh"
+      },
+      {
+        "command": "step7project.check",
+        "title": "Step7Project: Check Changes"
+      },
+      {
+        "command": "step7project.apply",
+        "title": "Step7Project: Apply Changes"
+      },
+      {
+        "command": "step7project.create",
+        "title": "Step7Project: Create Source or Block"
+      },
+      {
+        "command": "step7project.delete",
+        "title": "Step7Project: Mark for Deletion"
+      },
+      {
+        "command": "step7project.rename",
+        "title": "Step7Project: Rename Source"
+      },
+      {
+        "command": "step7project.copyPath",
+        "title": "Copy Absolute Path"
+      },
+      {
+        "command": "step7project.copyRelativePath",
+        "title": "Copy Relative Path"
+      },
+      {
+        "command": "step7project.reveal",
+        "title": "Reveal in File Explorer"
+      },
+      {
+        "command": "step7project.text",
+        "title": "Open as Text"
+      },
+      {
+        "command": "step7project.diff",
+        "title": "Show Changes"
+      },
+      {
+        "command": "step7project.restore",
+        "title": "Step7Project: Restore Backup to New Folder"
+      },
+      {
+        "command": "step7project.symbolFormat",
+        "title": "Step7Project: Switch Symbols Format"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "step7project.open",
+          "when": "view == step7project.tree",
+          "group": "navigation"
+        },
+        {
+          "command": "step7project.refresh",
+          "when": "view == step7project.tree",
+          "group": "navigation"
+        },
+        {
+          "command": "step7project.apply",
+          "when": "view == step7project.tree"
+        },
+        {
+          "command": "step7project.check",
+          "when": "view == step7project.tree"
+        },
+        {
+          "command": "step7project.create",
+          "when": "view == step7project.tree"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "step7project.copyPath",
+          "when": "view == step7project.tree && viewItem == file"
+        },
+        {
+          "command": "step7project.copyRelativePath",
+          "when": "view == step7project.tree && viewItem == file"
+        },
+        {
+          "command": "step7project.text",
+          "when": "view == step7project.tree && viewItem == file"
+        },
+        {
+          "command": "step7project.reveal",
+          "when": "view == step7project.tree && viewItem == file"
+        },
+        {
+          "command": "step7project.diff",
+          "when": "view == step7project.tree && viewItem == file"
+        },
+        {
+          "command": "step7project.delete",
+          "when": "view == step7project.tree && viewItem == file"
+        },
+        {
+          "command": "step7project.rename",
+          "when": "view == step7project.tree && viewItem == file"
+        },
+        {
+          "command": "step7project.check",
+          "when": "view == step7project.tree && viewItem == file",
+          "group": "step7"
+        },
+        {
+          "command": "step7project.apply",
+          "when": "view == step7project.tree && viewItem == file",
+          "group": "step7"
+        }
+      ]
+    },
+    "customEditors": [
+      {
+        "viewType": "step7project.symbols",
+        "displayName": "STEP 7 Symbols",
+        "selector": [
+          {
+            "filenamePattern": "*.symbols.csv"
+          }
+        ],
+        "priority": "option"
+      }
+    ],
+    "configuration": {
+      "title": "Step7Project",
+      "properties": {
+        "step7project.awl.mnemonics": {
+          "type": "string",
+          "enum": ["english", "german"],
+          "default": "english",
+          "description": "AWL/STL export dialect for newly opened projects. Match STEP 7 Options > Customize > Language. Existing workspaces: CLI configure --mnemonics, then refresh."
+        },
+        "step7project.backup.mode": {
+          "type": "string",
+          "enum": [
+            "off",
+            "everySave",
+            "1m",
+            "10m",
+            "30m",
+            "1h"
+          ],
+          "default": "everySave",
+          "description": "Backup previous file versions, including observed external/AI writes. Enabled modes also snapshot the native project before apply."
+        },
+        "step7project.backup.directory": {
+          "type": "string",
+          "default": "",
+          "description": "Backup directory. Empty: .step7project/backups in the editing workspace."
+        },
+        "step7project.symbols.editor": {
+          "type": "string",
+          "enum": [
+            "table",
+            "text",
+            "default"
+          ],
+          "default": "table",
+          "description": "Table, built-in text, or default editor (allows third-party CSV editors)."
+        },
+        "step7project.symbols.format": {
+          "type": "string",
+          "enum": [
+            "csv",
+            "asc"
+          ],
+          "default": "csv",
+          "description": "Canonical symbols format for newly opened projects. Use Switch Symbols Format for existing workspaces."
+        },
+        "step7project.backend.path": {
+          "type": "string",
+          "default": "",
+          "description": "Optional absolute path to Step7Bridge.exe on the extension host."
+        }
+      }
+    },
+    "languages": [
+      {
+        "id": "step7-scl",
+        "aliases": [
+          "STEP 7 SCL"
+        ],
+        "extensions": [
+          ".scl"
+        ]
+      },
+      {
+        "id": "step7-awl",
+        "aliases": [
+          "STEP 7 AWL/STL"
+        ],
+        "extensions": [
+          ".awl",
+          ".stl"
+        ]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "step7-scl",
+        "scopeName": "source.step7-scl",
+        "path": "./media/scl.tmLanguage.json"
+      },
+      {
+        "language": "step7-awl",
+        "scopeName": "source.step7-awl",
+        "path": "./media/awl.tmLanguage.json"
+      }
+    ]
+  }
+}
