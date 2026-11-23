@@ -6,41 +6,45 @@ import {atomic,inside,safeName,hash,readText,copyProject,contains} from './stora
 import {parseAsc,toCsv,parseCsv,toAsc} from './symbols';
 import {Backups} from './backups';
 import {intervals} from './backups';
-import {agentGuide,launcher} from './guidance';
+import {agentGuide,refreshLauncher} from './guidance';
+import {projectReference} from './projectViews';
 export interface Change {entry:Entry;state:'modified'|'new'|'delete'|'missing'|'readOnly'|'unchanged'}
 export class Workspace {
   manifest:Manifest;
   constructor(readonly root:string,readonly backend:Backend){
     this.root=path.resolve(root);this.manifest=JSON.parse(readText(path.join(root,'step7project.json')));
-    if(this.manifest.schema!==1)throw Error('Unsupported workspace schema');
+    if(![1,2].includes(this.manifest.schema))throw Error('Unsupported workspace schema');
+    this.manifest.projectPathMode=this.manifest.projectPathMode||(path.isAbsolute(this.manifest.project)?'absolute':'relative');
+    if(!['relative','absolute'].includes(this.manifest.projectPathMode))throw Error('Invalid project path mode in workspace manifest');
+    this.manifest.project=path.resolve(this.root,this.manifest.project);
     if(!Object.hasOwn(intervals,this.manifest.backupMode))throw Error('Invalid backup mode in workspace manifest');
     const mnemonics=this.manifest.awlMnemonics||'english';if(!['english','german'].includes(mnemonics))throw Error('Invalid AWL mnemonics in workspace manifest');
     this.backend=backend.withMnemonics?.(mnemonics)||backend;
     for(const e of this.manifest.entries){inside(root,e.file);inside(root,'.step7project/base/'+hash(e.id));}
     if(new Set(this.manifest.entries.map(e=>e.file.toLowerCase())).size!==this.manifest.entries.length)throw Error('Duplicate managed paths');
   }
-  static async open(project:string,root:string,backend:Backend,format:'csv'|'asc'='csv',mode:BackupMode='everySave',mnemonics:Mnemonics='english'){
+  static async open(project:string,root:string,backend:Backend,format:'csv'|'asc'='csv',mode:BackupMode='everySave',mnemonics:Mnemonics='english',projectPathMode:'relative'|'absolute'='relative'){
     project=path.resolve(project);root=path.resolve(root);
     if(contains(path.dirname(project),root))throw Error('Choose an editing workspace outside the native project folder');
     if(fs.existsSync(path.join(root,'step7project.json')))throw Error('Workspace is already initialized. Use refresh.');
     if(fs.existsSync(path.join(root,'Programs'))||fs.existsSync(path.join(root,'.step7project')))throw Error('Choose a clean editing workspace; managed files already exist');
     const snapshot=await (backend.withMnemonics?.(mnemonics)||backend).read(project);
-    const manifest:Manifest={schema:1,project,projectName:snapshot.name,encoding:snapshot.encoding,programs:snapshot.programs,entries:[],symbolsFormat:format,backupMode:mode,awlMnemonics:mnemonics};
+    const manifest:Manifest={schema:2,project,projectPathMode,projectName:snapshot.name,encoding:snapshot.encoding,programs:snapshot.programs,entries:[],symbolsFormat:format,backupMode:mode,awlMnemonics:mnemonics};
     fs.mkdirSync(root,{recursive:true});atomic(path.join(root,'step7project.json'),JSON.stringify(manifest,null,2));
     const w=new Workspace(root,backend);w.merge(snapshot);new Backups(root,w.manifest).observe(Date.now(),true);
     // Project-owned guidance; never overwrite an existing user's AGENTS.md.
     if(!fs.existsSync(path.join(root,'AGENTS.md')))atomic(path.join(root,'AGENTS.md'),agentGuide());
-    if(!fs.existsSync(path.join(root,'step7project.cmd')))atomic(path.join(root,'step7project.cmd'),launcher());
+    refreshLauncher(root);
     return w;
   }
-  save(){atomic(path.join(this.root,'step7project.json'),JSON.stringify(this.manifest,null,2)+'\n');}
+  save(){if(this.manifest.projectPathMode==='relative')this.manifest.schema=2;atomic(path.join(this.root,'step7project.json'),JSON.stringify({...this.manifest,project:projectReference(this.manifest.project,this.root,this.manifest.projectPathMode||'absolute')},null,2)+'\n');}
   base(e:Entry){return inside(this.root,'.step7project/base/'+hash(e.id));}
   content(i:NativeItem){return i.kind==='symbols'&&this.manifest.symbolsFormat==='csv'?toCsv(parseAsc(i.content),false):i.content;}
   private makeEntry(i:NativeItem):Entry {
     const prg=this.manifest.programs.find(p=>p.id===i.program);if(!prg)throw Error('Unknown program '+i.program);
     const base=['Programs',...prg.path.map(safeName)].join('/');
     const name=safeName(i.kind==='block'?i.nativeName+(i.name&&i.name!==i.nativeName?'.'+i.name:''):i.name);
-    const ext=i.kind==='symbols'?`.symbols.${this.manifest.symbolsFormat}`:i.kind==='block'?'.awl':'.'+(i.language||'txt').toLowerCase();
+    const ext=i.kind==='symbols'?`.${this.manifest.symbolsFormat}`:i.kind==='block'?'.awl':'.'+(i.language||'txt').toLowerCase();
     const folder=i.kind==='source'?'Sources':i.kind==='symbols'?'Symbols':'Blocks/'+safeName(i.blockType);
     let file=`${base}/${folder}/${name}${ext}`;
     if(this.manifest.entries.some(e=>e.file.toLowerCase()===file.toLowerCase()))file=`${base}/${folder}/${name}.${hash(i.id).slice(0,8)}${ext}`;
@@ -70,7 +74,13 @@ export class Workspace {
   });}
   entry(id:string){const e=this.manifest.entries.find(e=>e.id===id||e.file===id);if(!e)throw Error('Unknown object: '+id);return e;}
   delete(id:string){const e=this.entry(id);if(e.readOnly&&!e.canDelete)throw Error(e.reason||'Read-only object');if(e.kind==='symbols')throw Error('Clear symbol rows in the table instead of deleting the symbol table');if(e.pending==='create'){new Backups(this.root,this.manifest).observe(Date.now(),true);const file=inside(this.root,e.file);if(fs.existsSync(file))fs.unlinkSync(file);this.manifest.entries=this.manifest.entries.filter(x=>x!==e);}else e.pending='delete';this.save();}
-  rename(id:string,name:string){const e=this.entry(id);if(e.kind!=='source'||e.readOnly)throw Error('Only writable source names can be renamed; block numbers require a new block');if(!name.trim()||/[\\/\x00-\x1f]/.test(name))throw Error('Invalid source name');if(this.manifest.entries.some(x=>x.program===e.program&&x.kind==='source'&&(x.renamed||x.nativeName).toLowerCase()===name.toLowerCase()))throw Error('Source name already exists');e.renamed=name;this.save();}
+  renameProblem(id:string,name:string):string|undefined {
+    const e=this.entry(id);
+    if(e.kind!=='source'||e.readOnly)return 'Only writable sources can be renamed. Edit block symbols in Symbols; changing block numbers requires a separate migration.';
+    if(!name||name.length>24||name.startsWith('.')||name!==name.trim()||safeName(name)!==name)return 'Use 1–24 characters without Windows reserved names, special filename characters, or leading/trailing spaces and dots.';
+    if(this.manifest.entries.some(x=>x!==e&&x.program===e.program&&x.kind==='source'&&[x.nativeName,x.renamed].some(n=>n?.toLowerCase()===name.toLowerCase())))return 'Source name already exists';
+  }
+  rename(id:string,name:string){const problem=this.renameProblem(id,name);if(problem)throw Error(problem);const e=this.entry(id);if(name===e.nativeName)delete e.renamed;else e.renamed=name;this.save();}
   create(program:string,type:string,number:number,language:'scl'|'awl'='scl',instanceOf?:string):Entry {
     if(!this.manifest.programs.some(p=>p.id===program))throw Error('Unknown program');
     type=type.toUpperCase();if(!['OB','FC','FB','DB','UDT'].includes(type)||!Number.isInteger(number)||number<1||number>65535)throw Error('Invalid block type or number');
@@ -159,11 +169,19 @@ export class Workspace {
     try{return await action();}finally{fs.closeSync(fd);fs.unlinkSync(lock);}
   }
   switchSymbols(format:'csv'|'asc'){
-    if(format===this.manifest.symbolsFormat)return;
+    const tables=this.manifest.entries.filter(e=>e.kind==='symbols');
+    const target=(e:Entry)=>e.file.replace(/(?:\.symbols)?\.(csv|asc)$/i,'.'+format);
+    if(format===this.manifest.symbolsFormat&&tables.every(e=>target(e)===e.file))return;
     if(this.status().some(c=>c.entry.kind==='symbols'&&c.state!=='unchanged'))throw Error('Apply or revert symbol changes before switching format');
-    for(const e of this.manifest.entries.filter(e=>e.kind==='symbols')){
-      const old=inside(this.root,e.file),rows=this.manifest.symbolsFormat==='csv'?parseCsv(readText(old)):parseAsc(readText(old));
-      e.file=e.file.replace(/\.(csv|asc)$/,'.'+format);const text=format==='csv'?toCsv(rows):toAsc(rows);atomic(inside(this.root,e.file),text);atomic(this.base(e),text);e.baseHash=hash(text);fs.unlinkSync(old);
+    const changes=tables.map(e=>{
+      const file=target(e),old=inside(this.root,e.file),next=inside(this.root,file);
+      if(next!==old&&fs.existsSync(next))throw Error('Symbols destination already exists: '+file);
+      const original=readText(old),rows=this.manifest.symbolsFormat==='csv'?parseCsv(original,false):parseAsc(original);
+      const text=format===this.manifest.symbolsFormat?original:format==='csv'?toCsv(rows,false):toAsc(rows);
+      return {e,file,old,next,text};
+    });
+    for(const {e,file,old,next,text} of changes){
+      atomic(next,text);atomic(this.base(e),text);if(old!==next){fs.chmodSync(old,0o666);fs.unlinkSync(old);}e.file=file;e.baseHash=hash(text);if(e.readOnly)fs.chmodSync(next,0o444);
     }
     this.manifest.symbolsFormat=format;this.save();
   }

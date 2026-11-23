@@ -1,5 +1,36 @@
 # Проверки и ограничения
 
+## 0.1.1 — 2026-11-23
+
+Обновление интерфейса и представлений. C# backend и разрешённые нативные форматы записи не менялись; нативные циклы от 2026-11-21 ниже относятся к версии 0.1.0 и повторно в этом обновлении не запускались. Пользовательские проекты и открытый S15-2026-code не изменялись.
+
+Локально выполнены `npm test` и Extension Host на том же установленном VS Code с отдельными TEMP-профилями English и Russian. Для Russian изолированный профиль использует регистрацию уже установленного языкового пакета только для чтения; пользовательский профиль не изменяется. В первом русском запуске без языкового пакета VS Code выбрал English — это выявил тест. После подключения пакета русские подписи проверены настоящим `vscode.l10n`, а не подстановкой тестового словаря.
+
+Результаты: **52 локальных теста passed, 0 failed, 0 skipped**; **11 UI-сценариев passed для English и 11 для Russian**, оба процесса завершились с кодом 0. Отчёты последнего запуска: `%TEMP%\SPB-vscode-HW9Q7T\projects\ui-test-results.json` (en) и `%TEMP%\SPB-vscode-2A65Lu\projects\ui-test-results.json` (ru). В тесте launcher сравнение путей уточнено с учётом нечувствительности Windows к регистру диска; фактическая ссылка проверяется на текущий runtime и текущую папку расширения.
+
+`npm run package` собрал VSIX 0.1.1 без ошибок backend-сборки. `packaged_cli_offline_export` из `tools/verify-package.ps1` прошёл на содержимом VSIX: 2 программы / 112 объектов unchanged, schema 2 и относительная привязка разрешились в точный нативный путь. В пакете есть переводы, helper привязок и документация; пользовательские примеры и тестовые каталоги исключены. Установка в пользовательский профиль автоматически не выполнялась.
+
+| Требование | Доказательство |
+| --- | --- |
+| Две отдельные стандартные группы, все пять действий и русский/английский интерфейс | `vscode_localized_controls_are_separate_and_all_actions_are_visible` в обоих языках; `localization_covers_manifest_and_runtime_strings_with_matching_parameters` проверяет полноту переводов и параметры |
+| Автоматический поиск вложенных представлений без обхода backups | `vscode_discovers_nested_project_views_and_ignores_backups`: два вложенных представления найдены, третье в .step7project исключено |
+| Активный проект, подсказки и ссылки | `vscode_active_project_controls_show_native_and_view_locations`: пути и переходы соответствуют активному проекту; смена файла переключает проект, ручной выбор переживает reload |
+| Контекстное меню расположений | `vscode_project_location_context_menu_copies_correct_paths`: реальные команды записывают полный/относительный путь в clipboard, прежнее содержимое восстанавливается; проверены регистрации меню |
+| Привязки представлений | `project_view_index_reconnects_only_matching_manifests_and_preserves_multiple_views`: проверяются текущий путь проекта, schema, дубликаты, повреждённые и отсутствующие JSON; неизвестные записи индекса сохраняются |
+| Переносимость и диски | `relative_project_reference_survives_moving_native_project_and_view_together`, `project_view_index_resolves_relative_references_and_cross_drive_falls_back_to_absolute`: папки скопированы в другое место, native-путь правильно разрешён; разные диски дают абсолютный путь |
+| Старые манифесты и локальные изменения | `project_path_configuration_preserves_legacy_absolute_paths_and_local_edits`: schema 1 / абсолютный путь сохраняются; явный переход на относительный включает schema 2 и не меняет локальные правки |
+| Launcher на другой машине | `generated_launcher_rebinds_after_transfer_without_overwriting_custom_scripts`: распознанный старый launcher обновлён, пользовательский сохранён |
+| Короткое имя Symbols и сохранность старых файлов | `symbols_new_exports_use_simple_filename_and_explicit_migration_keeps_legacy_edits`, `symbols_legacy_migration_refuses_existing_destination_without_overwrite` |
+| Переименование Sources | `source_rename_validates_names_duplicates_and_keeps_block_declarations`: недопустимые имена и DB отклонены, длина 24 принята / 25 отклонена, дубликаты проверяются без регистра; код, номер блока и ссылки не меняются |
+
+Для имён Sources использовано ограничение из [Siemens S7-SCL V5.3 for S7-300/400](https://cache.industry.siemens.com/dl/files/793/5581793/att_66783/v1/SCL_e.pdf): до 24 символов. Ограничения Windows дополнительно проверяются локально; возможность нативного импорта окончательно проверяет существующий staging.
+
+Локализация использует `package.nls` и `vscode.l10n` по [официальному примеру VS Code](https://github.com/microsoft/vscode-extension-samples/tree/main/l10n-sample), группы — стандартный [Tree View API](https://code.visualstudio.com/api/extension-guides/tree-view). Тесты проверяют TreeDataProvider и команды внутри реального Extension Host, не визуальную раскладку каждого пикселя или все диалоги Windows Explorer. CLI и сообщения нативного компилятора остаются техническими диагностическими данными на исходном языке.
+
+Воспроизведение обновлённых UI-проверок: `npm run test:vscode`, затем `node tools/test-vscode.cjs --ru`. Второй запуск требует установленного Russian Language Pack. Полные unit-проверки: `npm test`. Сборка и проверка пакета: `npm run package`, затем `powershell -NoProfile -ExecutionPolicy Bypass -File tools/verify-package.ps1`.
+
+## 0.1.0 — 2026-11-21
+
 Дата: **2026-11-21**. Это журнал выполненных проверок версии 0.1.0, а не заявление о проверке программы на ПЛК.
 
 ## Среда

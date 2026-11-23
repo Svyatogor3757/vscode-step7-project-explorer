@@ -69,3 +69,43 @@ test('awl_mnemonics_are_persisted_and_isolated_between_workspaces',async t=>{
  assert.equal(english.manifest.awlMnemonics,'english');assert.equal(reopened.manifest.awlMnemonics,'german');
  german.manifest.awlMnemonics='invalid';german.save();assert.throws(()=>new Workspace(german.root,backend),/Invalid AWL mnemonics/);
 });
+test('symbols_new_exports_use_simple_filename_and_explicit_migration_keeps_legacy_edits',async t=>{
+ const {w}=await fixture(t,[item('symbols','Symbols',toAsc([row]),{language:'asc'})]);const e=w.manifest.entries[0];
+ assert.match(e.file,/\/Symbols\/Symbols\.csv$/);const simple=e.file,legacy=simple.replace(/\.csv$/,'.symbols.csv'),text=readTextTest(inside(w.root,simple));
+ fs.renameSync(inside(w.root,simple),inside(w.root,legacy));e.file=legacy;w.save();
+ fs.writeFileSync(inside(w.root,legacy),text+'\r\n');assert.throws(()=>w.switchSymbols('csv'),/Apply or revert/);assert.equal(e.file,legacy);assert.equal(readTextTest(inside(w.root,legacy)),text+'\r\n');
+ fs.writeFileSync(inside(w.root,legacy),text);w.switchSymbols('csv');assert.equal(e.file,simple);assert.equal(readTextTest(inside(w.root,simple)),text);assert(!fs.existsSync(inside(w.root,legacy)));assert.equal(w.status()[0].state,'unchanged');
+});
+test('symbols_legacy_migration_refuses_existing_destination_without_overwrite',async t=>{
+ const {w}=await fixture(t,[item('symbols','Symbols',toAsc([row]),{language:'asc'})]);const e=w.manifest.entries[0],original=e.file,legacy=original.replace(/\.csv$/,'.symbols.csv');
+ fs.renameSync(inside(w.root,original),inside(w.root,legacy));e.file=legacy;w.save();fs.writeFileSync(inside(w.root,original),'unmanaged content');
+ assert.throws(()=>w.switchSymbols('csv'),/destination already exists/);assert.equal(readTextTest(inside(w.root,original)),'unmanaged content');assert.equal(e.file,legacy);assert.equal(w.status()[0].state,'unchanged');
+});
+test('source_rename_validates_names_duplicates_and_keeps_block_declarations',async t=>{
+ const {w}=await fixture(t,[item('source','Main',template('FC',10,'scl')),item('source','Other',template('FC',11,'scl')),item('block','DB117','DATA_BLOCK DB117\nEND_DATA_BLOCK')]);const e=w.manifest.entries[0],text=readTextTest(inside(w.root,e.file));
+ for(const name of ['', ' ', ' Leading','Trailing ', 'Trailing.', 'a/b','a\\b','a:b','a"b','CON','NUL.scl','a'.repeat(25)])assert.throws(()=>w.rename(e.id,name),/1–24/);
+ assert.throws(()=>w.rename(e.id,'oThEr'),/already exists/);assert.throws(()=>w.rename(w.manifest.entries[2].id,'MyDB'),/Only writable sources/);
+ assert.equal(e.renamed,undefined);w.rename(e.id,'a'.repeat(24));assert.equal(w.operations()[0].name,'a'.repeat(24));assert.equal(w.operations()[0].content,text);assert.equal(w.operations()[0].nativeName,'Main');assert.equal(readTextTest(inside(w.root,e.file)),text);
+ w.rename(e.id,'Main');assert.equal(e.renamed,undefined);assert.equal(w.status()[0].state,'unchanged');
+});
+test('relative_project_reference_survives_moving_native_project_and_view_together',async t=>{
+ const {root,project,backend,w}=await fixture(t);const stored=JSON.parse(readTextTest(path.join(w.root,'step7project.json')));
+ assert.equal(stored.project,'../native/demo.s7p');assert.equal(stored.projectPathMode,'relative');assert.equal(w.manifest.project,project);
+ const moved=path.join(root,'moved');fs.mkdirSync(moved);fs.cpSync(path.dirname(project),path.join(moved,'native'),{recursive:true});fs.cpSync(w.root,path.join(moved,'code'),{recursive:true});
+ const reopened=new Workspace(path.join(moved,'code'),backend);assert.equal(reopened.manifest.project,path.join(moved,'native','demo.s7p'));assert(fs.existsSync(reopened.manifest.project));assert.equal(reopened.status()[0].state,'unchanged');
+ let readProject;const read=backend.read.bind(backend);backend.read=async file=>{readProject=file;return read(file);};await reopened.check();assert.equal(readProject,reopened.manifest.project);
+});
+test('project_path_configuration_preserves_legacy_absolute_paths_and_local_edits',async t=>{
+ const {project,backend,w}=await fixture(t);const file=path.join(w.root,'step7project.json'),legacy=JSON.parse(readTextTest(file));delete legacy.projectPathMode;legacy.schema=1;legacy.project=project;fs.writeFileSync(file,JSON.stringify(legacy));
+ const old=new Workspace(w.root,backend);old.save();assert.equal(JSON.parse(readTextTest(file)).project,project);assert.equal(old.manifest.projectPathMode,'absolute');assert.equal(old.manifest.schema,1);
+ const source=inside(w.root,w.manifest.entries[0].file),text=readTextTest(source)+'// pending\n';fs.writeFileSync(source,text);
+ const {main}=require('../dist/cli');await main(['configure','--workspace',w.root,'--project-path','relative']);assert.equal(JSON.parse(readTextTest(file)).project,'../native/demo.s7p');assert.equal(JSON.parse(readTextTest(file)).schema,2);assert.equal(readTextTest(source),text);
+ const status=await main(['status','--workspace',w.root]);assert.equal(status.project,project);assert.equal(status.workspace,w.root);assert.equal(status.changes[0].state,'modified');
+ await main(['configure','--workspace',w.root,'--project-path','absolute']);assert.equal(JSON.parse(readTextTest(file)).project,project);
+});
+test('generated_launcher_rebinds_after_transfer_without_overwriting_custom_scripts',async t=>{
+ const {w}=await fixture(t),{refreshLauncher,launcher}=require('../dist/guidance'),file=path.join(w.root,'step7project.cmd');
+ fs.writeFileSync(file,'@echo off\r\nsetlocal\r\nset "ELECTRON_RUN_AS_NODE=1"\r\n"C:\\Old\\Code.exe" "C:\\Old\\extension\\bin\\step7project.cjs" %*\r\n');
+ assert.equal(refreshLauncher(w.root),true);assert.equal(readTextTest(file),launcher());assert.equal(refreshLauncher(w.root),false);
+ fs.writeFileSync(file,'@echo off\r\necho User script\r\n');assert.equal(refreshLauncher(w.root),false);assert.equal(readTextTest(file),'@echo off\r\necho User script\r\n');
+});

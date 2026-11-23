@@ -1,8 +1,8 @@
 {
   "name": "step7project",
   "displayName": "Step7Project",
-  "description": "STEP 7 Classic project browser and AI-friendly offline editor for Windows.",
-  "version": "0.1.0",
+  "description": "%extension.description%",
+  "version": "0.1.1",
   "publisher": "step7project",
   "license": "MIT",
   "engines": {
@@ -49,7 +49,7 @@
       "activitybar": [
         {
           "id": "step7project",
-          "title": "Step7Project",
+          "title": "%view.explorer%",
           "icon": "media/step7.svg"
         }
       ]
@@ -57,140 +57,171 @@
     "views": {
       "step7project": [
         {
+          "id": "step7project.controls",
+          "name": "%view.controls%",
+          "initialSize": 3
+        },
+        {
           "id": "step7project.tree",
-          "name": "Projects"
+          "name": "%view.project%",
+          "initialSize": 7
         }
       ]
     },
     "commands": [
       {
         "command": "step7project.open",
-        "title": "Step7Project: Open STEP 7 Project"
+        "title": "%command.open%",
+        "icon": "$(folder-open)"
       },
       {
         "command": "step7project.refresh",
-        "title": "Step7Project: Refresh"
+        "title": "%command.refresh%",
+        "icon": "$(refresh)"
       },
       {
         "command": "step7project.check",
-        "title": "Step7Project: Check Changes"
+        "title": "%command.check%",
+        "icon": "$(check)"
       },
       {
         "command": "step7project.apply",
-        "title": "Step7Project: Apply Changes"
+        "title": "%command.apply%",
+        "icon": "$(save-all)"
       },
       {
         "command": "step7project.create",
-        "title": "Step7Project: Create Source or Block"
+        "title": "%command.create%",
+        "icon": "$(new-file)"
       },
       {
         "command": "step7project.delete",
-        "title": "Step7Project: Mark for Deletion"
+        "title": "%command.delete%"
       },
       {
         "command": "step7project.rename",
-        "title": "Step7Project: Rename Source"
+        "title": "%command.rename%"
       },
       {
         "command": "step7project.copyPath",
-        "title": "Copy Absolute Path"
+        "title": "%command.copyPath%"
       },
       {
         "command": "step7project.copyRelativePath",
-        "title": "Copy Relative Path"
+        "title": "%command.copyRelativePath%"
       },
       {
         "command": "step7project.reveal",
-        "title": "Reveal in File Explorer"
+        "title": "%command.reveal%"
       },
       {
         "command": "step7project.text",
-        "title": "Open as Text"
+        "title": "%command.text%"
       },
       {
         "command": "step7project.diff",
-        "title": "Show Changes"
+        "title": "%command.diff%"
       },
       {
         "command": "step7project.restore",
-        "title": "Step7Project: Restore Backup to New Folder"
+        "title": "%command.restore%"
       },
       {
         "command": "step7project.symbolFormat",
-        "title": "Step7Project: Switch Symbols Format"
+        "title": "%command.symbolFormat%"
+      },
+      {
+        "command": "step7project.selectProject",
+        "title": "%command.selectProject%"
+      },
+      {
+        "command": "step7project.copyLocation",
+        "title": "%command.copyPath%"
+      },
+      {
+        "command": "step7project.copyRelativeLocation",
+        "title": "%command.copyRelativePath%"
+      },
+      {
+        "command": "step7project.revealLocation",
+        "title": "%command.reveal%"
+      },
+      {
+        "command": "step7project.revealLocationInWorkspace",
+        "title": "%command.revealLocationInWorkspace%"
       }
     ],
     "menus": {
-      "view/title": [
-        {
-          "command": "step7project.open",
-          "when": "view == step7project.tree",
-          "group": "navigation"
-        },
-        {
-          "command": "step7project.refresh",
-          "when": "view == step7project.tree",
-          "group": "navigation"
-        },
-        {
-          "command": "step7project.apply",
-          "when": "view == step7project.tree"
-        },
-        {
-          "command": "step7project.check",
-          "when": "view == step7project.tree"
-        },
-        {
-          "command": "step7project.create",
-          "when": "view == step7project.tree"
-        }
-      ],
+      "view/title": [],
       "view/item/context": [
         {
           "command": "step7project.copyPath",
-          "when": "view == step7project.tree && viewItem == file"
+          "when": "view == step7project.tree && viewItem =~ /^(file|source)$/"
         },
         {
           "command": "step7project.copyRelativePath",
-          "when": "view == step7project.tree && viewItem == file"
+          "when": "view == step7project.tree && viewItem =~ /^(file|source)$/"
         },
         {
           "command": "step7project.text",
-          "when": "view == step7project.tree && viewItem == file"
+          "when": "view == step7project.tree && viewItem =~ /^(file|source)$/"
         },
         {
           "command": "step7project.reveal",
-          "when": "view == step7project.tree && viewItem == file"
+          "when": "view == step7project.tree && viewItem =~ /^(file|source)$/"
         },
         {
           "command": "step7project.diff",
-          "when": "view == step7project.tree && viewItem == file"
+          "when": "view == step7project.tree && viewItem =~ /^(file|source)$/"
         },
         {
           "command": "step7project.delete",
-          "when": "view == step7project.tree && viewItem == file"
+          "when": "view == step7project.tree && viewItem =~ /^(file|source)$/"
         },
         {
           "command": "step7project.rename",
-          "when": "view == step7project.tree && viewItem == file"
+          "when": "view == step7project.tree && viewItem == source"
         },
         {
           "command": "step7project.check",
-          "when": "view == step7project.tree && viewItem == file",
+          "when": "view == step7project.tree && viewItem =~ /^(file|source)$/",
           "group": "step7"
         },
         {
           "command": "step7project.apply",
-          "when": "view == step7project.tree && viewItem == file",
+          "when": "view == step7project.tree && viewItem =~ /^(file|source)$/",
           "group": "step7"
+        },
+        {
+          "command": "step7project.copyLocation",
+          "when": "view == step7project.controls && viewItem =~ /^location\\./",
+          "group": "location"
+        },
+        {
+          "command": "step7project.copyRelativeLocation",
+          "when": "view == step7project.controls && viewItem =~ /^location\\./",
+          "group": "location"
+        },
+        {
+          "command": "step7project.revealLocation",
+          "when": "view == step7project.controls && viewItem =~ /^location\\./",
+          "group": "location"
+        },
+        {
+          "command": "step7project.revealLocationInWorkspace",
+          "when": "view == step7project.controls && viewItem == location.view",
+          "group": "location"
         }
       ]
     },
     "customEditors": [
       {
         "viewType": "step7project.symbols",
-        "displayName": "STEP 7 Symbols",
+        "displayName": "%editor.symbols%",
         "selector": [
+          {
+            "filenamePattern": "**/Symbols/*.csv"
+          },
           {
             "filenamePattern": "*.symbols.csv"
           }
@@ -203,9 +234,16 @@
       "properties": {
         "step7project.awl.mnemonics": {
           "type": "string",
-          "enum": ["english", "german"],
+          "enum": [
+            "english",
+            "german"
+          ],
           "default": "english",
-          "description": "AWL/STL export dialect for newly opened projects. Match STEP 7 Options > Customize > Language. Existing workspaces: CLI configure --mnemonics, then refresh."
+          "description": "%setting.step7project.awl.mnemonics%",
+          "enumDescriptions": [
+            "%enum.step7project.awl.mnemonics.0%",
+            "%enum.step7project.awl.mnemonics.1%"
+          ]
         },
         "step7project.backup.mode": {
           "type": "string",
@@ -218,12 +256,20 @@
             "1h"
           ],
           "default": "everySave",
-          "description": "Backup previous file versions, including observed external/AI writes. Enabled modes also snapshot the native project before apply."
+          "description": "%setting.step7project.backup.mode%",
+          "enumDescriptions": [
+            "%enum.step7project.backup.mode.0%",
+            "%enum.step7project.backup.mode.1%",
+            "%enum.step7project.backup.mode.2%",
+            "%enum.step7project.backup.mode.3%",
+            "%enum.step7project.backup.mode.4%",
+            "%enum.step7project.backup.mode.5%"
+          ]
         },
         "step7project.backup.directory": {
           "type": "string",
           "default": "",
-          "description": "Backup directory. Empty: .step7project/backups in the editing workspace."
+          "description": "%setting.step7project.backup.directory%"
         },
         "step7project.symbols.editor": {
           "type": "string",
@@ -233,7 +279,12 @@
             "default"
           ],
           "default": "table",
-          "description": "Table, built-in text, or default editor (allows third-party CSV editors)."
+          "description": "%setting.step7project.symbols.editor%",
+          "enumDescriptions": [
+            "%enum.step7project.symbols.editor.0%",
+            "%enum.step7project.symbols.editor.1%",
+            "%enum.step7project.symbols.editor.2%"
+          ]
         },
         "step7project.symbols.format": {
           "type": "string",
@@ -242,12 +293,25 @@
             "asc"
           ],
           "default": "csv",
-          "description": "Canonical symbols format for newly opened projects. Use Switch Symbols Format for existing workspaces."
+          "description": "%setting.step7project.symbols.format%"
         },
         "step7project.backend.path": {
           "type": "string",
           "default": "",
-          "description": "Optional absolute path to Step7Bridge.exe on the extension host."
+          "description": "%setting.step7project.backend.path%"
+        },
+        "step7project.projectPath.mode": {
+          "type": "string",
+          "enum": [
+            "relative",
+            "absolute"
+          ],
+          "default": "relative",
+          "description": "%setting.step7project.projectPath.mode%",
+          "enumDescriptions": [
+            "%enum.projectPath.relative%",
+            "%enum.projectPath.absolute%"
+          ]
         }
       }
     },
@@ -283,6 +347,13 @@
         "scopeName": "source.step7-awl",
         "path": "./media/awl.tmLanguage.json"
       }
+    ],
+    "viewsWelcome": [
+      {
+        "view": "step7project.tree",
+        "contents": "%view.welcome%"
+      }
     ]
-  }
+  },
+  "l10n": "./l10n"
 }

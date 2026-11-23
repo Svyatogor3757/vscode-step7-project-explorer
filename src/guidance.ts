@@ -1,4 +1,6 @@
 import path from 'node:path';
+import fs from 'node:fs';
+import {atomic,inside} from './storage';
 export function agentGuide():string {
  return `# Работа с STEP 7 через Step7Project
 
@@ -16,6 +18,8 @@ export function agentGuide():string {
 \`\`\`
 
 CLI всегда возвращает JSON. Код 0 означает успех; ненулевой код означает ошибку. check создаёт отдельный тестовый проект через STEP 7 и компилирует копии программ. apply повторяет проверку, затем изменяет нативный проект. Для записи нужен STEP 7 и проект, один раз открытый в SIMATIC Manager. При Remote SSH войди в Windows под той же учётной записью: компиляторы STEP 7 используют интерактивный сеанс.
+
+Поле project в step7project.json может быть относительным: оно разрешается от папки манифеста. status.project и status.workspace возвращают полные пути. Для переносимости обеих папок вместе используй configure --workspace . --project-path relative; absolute сохраняет абсолютную привязку. Не подставляй текущий каталог терминала при разрешении project. После передачи представления открой его папку или JSON в расширении: служебный launcher обновится для текущего хоста, пользовательский скрипт сохранится.
 
 ## Порядок работы
 
@@ -37,6 +41,8 @@ CLI всегда возвращает JSON. Код 0 означает успех
 
 Точный --program возьми из status.programs, --file из status.changes. Создание создаёт исходник, компиляция создаёт блоки. Удаление исходника не удаляет его скомпилированные блоки. Для удаления блока используй его отдельный путь. Исчезновение файла с диска не считается разрешением удалить объект в STEP 7. Применяй изменения исходников и прямые правки блоков одной программы отдельными пакетами.
 
+rename меняет имя объекта Sources (1–24 символа), а не имена функций внутри текста. Не переименовывай DB/FB/FC обычным перемещением файла: символьные имена задаются в Symbols, а смена номера требует отдельной миграции всех ссылок. Старое имя Symbols.symbols.csv допустимо. Чтобы перейти на Symbols.csv без локальных правок таблицы, закрой её редакторы и выполни symbols-format --workspace . --format csv; незнакомый целевой файл не перезаписывается.
+
 ## Ограничения и восстановление
 
 - Не меняй нативные DBF/DBT/MDX, hardware, сети или подключение ПЛК.
@@ -50,5 +56,14 @@ CLI всегда возвращает JSON. Код 0 означает успех
 }
 export function launcher():string {
  const cli=path.resolve(__dirname,'../bin/step7project.cjs');
- return `@echo off\r\nsetlocal\r\nset "ELECTRON_RUN_AS_NODE=1"\r\n"${process.execPath}" "${cli}" %*\r\n`;
+ return `@echo off\r\nrem Step7Project generated launcher\r\nsetlocal\r\nset "ELECTRON_RUN_AS_NODE=1"\r\n"${process.execPath}" "${cli}" %*\r\n`;
+}
+export function refreshLauncher(root:string):boolean {
+ const file=path.join(root,'step7project.cmd');
+ if(fs.existsSync(file)&&fs.lstatSync(file).isSymbolicLink())return false;
+ const existing=fs.existsSync(file)?fs.readFileSync(file,'utf8'):undefined;
+ const generated=/^@echo off\r?\n(?:rem Step7Project generated launcher\r?\n)?setlocal\r?\nset "ELECTRON_RUN_AS_NODE=1"\r?\n"[^"\r\n]+" "[^"\r\n]*[\\/]bin[\\/]step7project\.cjs" %\*\r?\n?$/i;
+ if(existing!==undefined&&!generated.test(existing))return false;
+ const next=launcher();if(existing===next)return false;
+ atomic(inside(root,'step7project.cmd'),next);return true;
 }
