@@ -20,6 +20,18 @@ const {Workspace}=require('../dist/workspace'),{toAsc}=require('../dist/symbols'
  }
  const args=['-NoProfile','-ExecutionPolicy','Bypass','-File',path.join(root,'tools/run-vscode.ps1'),'-CodePath','C:/Program Files/Microsoft VS Code/Code.exe','-WorkspacePath',workspace,'-TestsPath',path.join(root,'dist/vscodeSmoke.js'),'-ExtensionPath',root,'-UserData',path.join(temp,'profile'),'-Locale',locale];
  const env={...process.env,STEP7PROJECT_TEST_LOCALE:locale};delete env.ELECTRON_RUN_AS_NODE;
+ if(process.argv.includes('--upgrade')){
+  const oldPackage=process.env.STEP7PROJECT_UPGRADE_VSIX||path.join(root,'step7project-0.1.0.vsix'),destination=path.join(temp,'original-extension');
+  if(!fs.existsSync(oldPackage))throw Error('Set STEP7PROJECT_UPGRADE_VSIX to the original 0.1.0 VSIX');
+  const extracted=spawnSync('powershell.exe',['-NoProfile','-File',path.join(root,'tools/extract-upgrade-fixture.ps1'),'-Package',oldPackage,'-Destination',destination],{stdio:'inherit',env});if(extracted.status)throw Error('Could not extract upgrade fixture');
+  const seed=[...args];seed[seed.indexOf('-TestsPath')+1]=path.join(root,'dist/vscodeUpgradeSeed.js');seed[seed.indexOf('-ExtensionPath')+1]=path.join(destination,'extension');
+  const result=spawnSync('powershell.exe',seed,{stdio:'inherit',env});if(result.status)throw Error('Original release did not seed the VS Code layout');
+  const original=JSON.parse(fs.readFileSync(path.join(workspace,'upgrade-seed-results.json'),'utf8'));if(original.version!=='0.1.0')throw Error('Wrong upgrade seed');
+  // The seed profile contains no installed language-pack extension, so VS Code
+  // may prune its registration on exit. Restore the read-only test registration.
+  if(locale==='ru'){const packs=JSON.parse(fs.readFileSync(path.join(process.env.APPDATA,'Code','languagepacks.json'),'utf8'));fs.writeFileSync(path.join(temp,'profile','languagepacks.json'),JSON.stringify({ru:packs.ru}));}
+  console.log('UPGRADE_SEED='+original.version);
+ }
  const result=spawnSync('powershell.exe',args,{stdio:'inherit',env});
  if(result.status!==0)process.exit(result.status||1);
  const report=JSON.parse(fs.readFileSync(path.join(workspace,'ui-test-results.json'),'utf8'));console.log(JSON.stringify(report,null,2));

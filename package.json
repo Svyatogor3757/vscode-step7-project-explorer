@@ -2,7 +2,7 @@
   "name": "step7project",
   "displayName": "Step7Project",
   "description": "%extension.description%",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "step7project",
   "license": "MIT",
   "engines": {
@@ -59,16 +59,23 @@
         {
           "id": "step7project.controls",
           "name": "%view.controls%",
+          "visibility": "visible",
           "initialSize": 3
         },
         {
           "id": "step7project.tree",
           "name": "%view.project%",
+          "visibility": "visible",
           "initialSize": 7
         }
       ]
     },
     "commands": [
+      {
+        "command": "step7project.showControls",
+        "title": "%command.showControls%",
+        "icon": "$(list-tree)"
+      },
       {
         "command": "step7project.open",
         "title": "%command.open%",
@@ -152,7 +159,13 @@
       }
     ],
     "menus": {
-      "view/title": [],
+      "view/title": [
+        {
+          "command": "step7project.showControls",
+          "when": "view == step7project.tree",
+          "group": "navigation"
+        }
+      ],
       "view/item/context": [
         {
           "command": "step7project.copyPath",

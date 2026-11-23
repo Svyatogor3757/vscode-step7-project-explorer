@@ -15,6 +15,7 @@ backend/*.csproj
 **/*.pdb
 **/*.map
 dist/vscodeSmoke.js
+dist/vscodeUpgradeSeed.js
 .git/**
 debug.log
 .vscode/**

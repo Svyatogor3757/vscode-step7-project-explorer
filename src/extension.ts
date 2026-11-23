@@ -119,7 +119,8 @@ export async function activate(context:vscode.ExtensionContext){
  const backend=new Bridge(config().get<string>('backend.path')||undefined),tree=new Projects(backend,report,context.workspaceState.get<string>('activeProject'));
  const view=vscode.window.createTreeView('step7project.tree',{treeDataProvider:tree,showCollapseAll:true});
  const controlProvider=new ProjectControls(tree),controls=vscode.window.createTreeView('step7project.controls',{treeDataProvider:controlProvider});
- view.message=vscode.l10n.t('Save files → Check Changes → Apply Changes to write to STEP 7.');
+ view.title=vscode.l10n.t('Project');
+ controls.title=vscode.l10n.t('Project Controls');
  context.subscriptions.push(out,tree,view,controls,controlProvider,tree.onDidChangeTreeData(()=>{
   controlProvider.refresh();if(context.workspaceState.get<string>('activeProject')!==tree.active?.root)void context.workspaceState.update('activeProject',tree.active?.root);
   const previous=context.globalState.get<ProjectViewIndex>('projectViews',{}),next=rememberProjectViews(previous,tree.workspaces.map(w=>({project:w.manifest.project,root:w.root})));
@@ -141,6 +142,9 @@ export async function activate(context:vscode.ExtensionContext){
   else await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(file));
  }
  register('openEntry',open);register('text',(n:Node)=>open(n,true));
+ register('showControls',async()=>{
+  await vscode.commands.executeCommand('step7project.controls.focus');
+ });
  register('selectProject',chooseProject);
  register('revealNative',(n:Node)=>vscode.commands.executeCommand('revealFileInOS',vscode.Uri.file(n.workspace.manifest.project)));
  register('revealView',(n:Node)=>vscode.commands.executeCommand('revealInExplorer',vscode.Uri.file(n.workspace.root)));
@@ -214,5 +218,5 @@ export async function activate(context:vscode.ExtensionContext){
  context.subscriptions.push(watcher,watcher.onDidChange(changed),watcher.onDidCreate(changed),watcher.onDidDelete(changed),vscode.workspace.onDidSaveTextDocument(changed),vscode.workspace.onDidChangeWorkspaceFolders(()=>{void tree.discover().catch(report);}),vscode.window.onDidChangeActiveTextEditor(editor=>tree.selectFile(editor?.document.uri)),vscode.workspace.onDidChangeConfiguration(e=>{if(e.affectsConfiguration('step7project'))changed();}));
  const timer=setInterval(()=>{for(const b of tree.backups.values()){try{b.observe();}catch(e){out.appendLine('Backup: '+String(e));}}},1000);context.subscriptions.push({dispose(){clearInterval(timer);if(reload)clearTimeout(reload);}});
  await tree.discover();tree.selectFile(vscode.window.activeTextEditor?.document.uri);
- return {cli:path.resolve(context.extensionPath,'bin/step7project.cjs')};
+ return {cli:path.resolve(context.extensionPath,'bin/step7project.cjs'),getViewState:()=>({project:{title:view.title,message:view.message,visible:view.visible},controls:{title:controls.title,visible:controls.visible}})};
 }

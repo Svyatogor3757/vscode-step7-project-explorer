@@ -5,6 +5,7 @@
   "view.project": "Project",
   "editor.symbols": "STEP 7 Symbols",
   "command.open": "Open Project",
+  "command.showControls": "Show Project Controls",
   "command.refresh": "Refresh",
   "command.check": "Check Changes",
   "command.apply": "Apply Changes",

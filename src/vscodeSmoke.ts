@@ -7,7 +7,13 @@ import {Workspace} from './workspace';
 import {Bridge} from './bridge';
 import {Projects,ProjectControls} from './extension';
 export async function run(){
- const extension=vscode.extensions.getExtension('step7project.step7project');assert(extension);await extension.activate();
+ const extension=vscode.extensions.getExtension('step7project.step7project');assert(extension);const api=await extension.activate();
+ await vscode.commands.executeCommand('step7project.tree.focus');await vscode.commands.executeCommand('step7project.showControls');
+ for(let i=0;i<50&&!api.getViewState().controls.visible;i++)await new Promise(r=>setTimeout(r,100));
+ const state=api.getViewState(),russian=vscode.env.language.startsWith('ru');
+ assert.equal(state.controls.visible,true);assert.equal(state.project.visible,true);assert.equal(state.project.message||'', '');
+ assert.equal(state.project.title,russian?'Проект':'Project');assert.equal(state.controls.title,russian?'Управление проектом':'Project Controls');
+ console.log('PASS vscode_controls_focus_reveals_group_without_project_banner');
  const workspace=vscode.workspace.workspaceFolders![0].uri.fsPath,projects=new Projects(new Bridge(),e=>{throw e;});await projects.discover();
  assert.equal(projects.workspaces.length,2);assert(projects.workspaces.every(w=>w.root.startsWith(path.join(workspace,'views'))));
  console.log('PASS vscode_discovers_nested_project_views_and_ignores_backups');
@@ -65,5 +71,5 @@ export async function run(){
  assert.equal(document.getText(),'// Обновлённый интерфейс\n');console.log('PASS vscode_read_only_view_refreshes_after_export');
  await vscode.commands.executeCommand('workbench.action.closeAllEditors');
  controlProvider.dispose();projects.dispose();
- fs.writeFileSync(path.join(workspace,'ui-test-results.json'),JSON.stringify({locale,passed:['vscode_discovers_nested_project_views_and_ignores_backups','vscode_generated_launcher_uses_current_extension_host','vscode_localized_controls_are_separate_and_all_actions_are_visible','vscode_active_project_controls_show_native_and_view_locations','vscode_project_location_context_menu_copies_correct_paths','vscode_opens_real_scl_document','vscode_save_creates_previous_version_backup','vscode_opens_symbols_custom_editor','vscode_symbols_open_as_text_uses_same_file','vscode_read_only_document_uses_content_provider','vscode_read_only_view_refreshes_after_export']},null,2));
+ fs.writeFileSync(path.join(workspace,'ui-test-results.json'),JSON.stringify({locale,passed:['vscode_controls_focus_reveals_group_without_project_banner','vscode_discovers_nested_project_views_and_ignores_backups','vscode_generated_launcher_uses_current_extension_host','vscode_localized_controls_are_separate_and_all_actions_are_visible','vscode_active_project_controls_show_native_and_view_locations','vscode_project_location_context_menu_copies_correct_paths','vscode_opens_real_scl_document','vscode_save_creates_previous_version_backup','vscode_opens_symbols_custom_editor','vscode_symbols_open_as_text_uses_same_file','vscode_read_only_document_uses_content_provider','vscode_read_only_view_refreshes_after_export']},null,2));
 }
