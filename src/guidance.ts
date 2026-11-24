@@ -2,7 +2,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import {atomic,inside} from './storage';
 export function agentGuide():string {
- return `# Working with STEP 7 through Step7Project
+ return `# Working with STEP 7 through Step7ProjectExplorer
 
 This directory is an editable view of a native STEP 7 Classic project. Files under Programs are available to ordinary reading, search and editing tools. Saving text does not apply changes to STEP 7.
 
@@ -24,7 +24,7 @@ The project field in step7project.json may be relative to the manifest directory
 ## Workflow
 
 1. Run status. Identify the program by its full ID: different CPUs can share filenames and block numbers.
-2. Read and edit the ordinary file whose path the user copied from Step7Project. Edit SCL in Sources; Blocks is a separate representation of compiled blocks.
+2. Read and edit the ordinary file whose path the user copied from Step7ProjectExplorer. Edit SCL in Sources; Blocks is a separate representation of compiled blocks.
 3. Save UTF-8. Preserve the symbols CSV header symbol,address,type,comment, quoting and unaffected rows. VAT can have an empty type. ASC has fixed-width fields.
 4. Run status and check. Resolve compiler errors and conflicts. Edit original SCL sources rather than their compiled representation.
 5. Run apply when the task authorizes native-project writes. Otherwise retain local edits and report them as unapplied.

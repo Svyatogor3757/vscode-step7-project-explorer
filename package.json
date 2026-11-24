@@ -1,8 +1,8 @@
 {
   "name": "step7project",
-  "displayName": "Step7Project",
+  "displayName": "Step7ProjectExplorer",
   "description": "%extension.description%",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "publisher": "step7project",
   "author": {
     "name": "Cody",
@@ -22,8 +22,28 @@
     "node": ">=20"
   },
   "categories": [
-    "Other",
     "Programming Languages"
+  ],
+  "keywords": [
+    "siemens",
+    "step7",
+    "step 7 classic",
+    "simatic",
+    "s7-300",
+    "plc",
+    "scl",
+    "awl",
+    "stl",
+    "project explorer",
+    "step7 project",
+    "scl project explorer",
+    "symbols",
+    "data blocks",
+    "udt",
+    "industrial automation",
+    "code review",
+    "ai agents",
+    "codex"
   ],
   "main": "./dist/extension.js",
   "extensionKind": [
@@ -264,7 +284,7 @@
       }
     ],
     "configuration": {
-      "title": "Step7Project",
+      "title": "Step7ProjectExplorer",
       "properties": {
         "step7project.interface.customFile": {
           "type": "string",

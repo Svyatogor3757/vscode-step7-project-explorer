@@ -111,5 +111,5 @@ jobs:
             exit 1
           fi
           gh release create "$RELEASE_TAG" --repo "$GH_REPO" --verify-tag --draft \
-            --title "Step7Project $RELEASE_TAG" --notes-file RELEASE-NOTES.md \
+            --title "Step7ProjectExplorer $RELEASE_TAG" --notes-file RELEASE-NOTES.md \
             ./*.vsix SHA256SUMS.txt

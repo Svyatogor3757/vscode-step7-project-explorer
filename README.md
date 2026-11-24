@@ -1,16 +1,20 @@
-# Step7Project
+# Step7ProjectExplorer
 
 **English** | [Русский](README.ru.md)
 
-Step7Project is a VS Code extension that creates an **editable project view of an existing STEP 7 Classic project**. The view is a separate directory containing source code, symbol tables and block representations as ordinary UTF-8 files. You can read and edit those files, save changes, then check and apply them to the original project through STEP 7.
+Step7ProjectExplorer is a **VS Code extension that makes editing STEP 7 Classic project code more convenient**. It complements Siemens' standard tools with project-wide search, multi-file editing, Git diffs and VS Code extensions for working with code. Hardware, networks and other project settings remain in Siemens' standard applications. Sources, blocks and symbols share one workspace, where you can inspect dependencies through code references and update them alongside the program.
+
+To make this possible, the extension creates an **editable project view**: a separate directory containing sources, symbol tables and block representations as ordinary UTF-8 files. You edit these files in VS Code, check your changes on a temporary project copy, then apply them to the original through STEP 7. Changes to block interfaces and dependencies require consistency checks in STEP 7.
+
+The extension's second purpose is **AI-assisted study, code review, creation and refinement**. Codex or another agent with file and terminal access can study the project, trace references, propose edits, create supported sources and check the result through the CLI. Give the agent a file path from the tree; the generated AGENTS.md explains how to check and apply changes.
 
 The extension works with **Sources, Symbols and Blocks** for **STEP 7 V5.5 SP3 / S7-300 on Windows**. Some blocks and symbol tables are read-only; the tree and CLI show why. Hardware configuration, NetPro, connections and PLC downloads remain in STEP 7.
 
-AI agents can work with the same files and CLI. Copy a path from the tree, give it to Codex or another terminal-capable agent, and use the generated AGENTS.md for the check/apply workflow.
+You can also work through **VS Code Remote SSH**, connecting to a Windows host with STEP 7 and the extension installed.
 
 ## Quick start
 
-Install a VSIX using **Extensions → … → Install from VSIX**, then open **Step 7 Project Explorer**. The local 0.1.4 package is `releases/step7project-0.1.4.vsix`. Original code is MIT; dependencies retain their [own licenses and review notes](THIRD-PARTY-NOTICES.md). Historical GitHub builds are drafts. After updating an installation, run **Developer: Reload Window**.
+Download a VSIX from [GitHub Releases](https://github.com/Svyatogor3757/vscode-step7-project-explorer/releases), install it using **Extensions → … → Install from VSIX**, then open **Step7ProjectExplorer**. The local 0.1.5 package is `releases/step7project-0.1.5.vsix`. Original code is MIT; dependencies retain their [own licenses and review notes](THIRD-PARTY-NOTICES.md). After updating an installation, run **Developer: Reload Window**.
 
 1. In **Project Controls**, choose **Open Project** and select the original STEP 7 project file, for example `D:\PLC\Plant\Plant.s7p`.
 2. In the next dialog, select the **folder in which to store the project view**. The extension creates `<project-name>-code` inside it. For example, selecting `D:\Code` creates `D:\Code\Plant-code`. This is the editable view directory, separate from the original project.
@@ -32,7 +36,7 @@ To reconnect an existing view, choose its `step7project.json` instead of creatin
 | Keep backups | Choose a backup schedule, inspect previous file versions, and restore a snapshot into a new directory. |
 | Work with an AI agent | Use real file paths, generated instructions and CLI commands for status, checks, creation, rename, deletion and Apply. |
 | Reopen or move a view | Open step7project.json, reuse known views and store relative native-project paths when possible. |
-| Choose a language | Follow the VS Code language, select English/Russian, or import a partial personal translation with English fallback. The Step 7 Project Explorer name stays English. |
+| Choose a language | Follow the VS Code language, select English/Russian, or import a partial personal translation with English fallback. The Step7ProjectExplorer name stays English. |
 | Use Remote SSH | Run the extension and backend on the Windows host containing STEP 7 and the project. |
 
 
@@ -132,7 +136,7 @@ Before writing, the extension checks the affected program inventory, compiles a 
 
 The native COM API provides no shared transaction across multiple imports. A write failure preserves local edits and sets a durable `recovery` barrier, blocking further Apply operations until operator review. There is no automatic rollback over an open project. States and recovery steps are described in the agent usage guide.
 
-Avoid editing the same program simultaneously in SIMATIC Manager and the extension. The Step7Project lock excludes another instance of this tool; it does not lock Siemens editors. Test projects and logs remain in `%TEMP%` for diagnostics.
+Avoid editing the same program simultaneously in SIMATIC Manager and the extension. The Step7ProjectExplorer lock excludes another instance of this tool; it does not lock Siemens editors. Test projects and logs remain in `%TEMP%` for diagnostics.
 
 ## Building and verification
 
@@ -174,7 +178,7 @@ Git tags identify historical source revisions; binaries belong in [GitHub Releas
 
 ## License
 
-Original Step7Project code is licensed under [MIT](LICENSE). Author: **Cody** ([Svyatogor3757](https://github.com/Svyatogor3757)). Retain the copyright and full license text when distributing copies or substantial portions.
+Original Step7ProjectExplorer code is licensed under [MIT](LICENSE). Author: **Cody** ([Svyatogor3757](https://github.com/Svyatogor3757)). Retain the copyright and full license text when distributing copies or substantial portions.
 
 Third-party components retain their licenses and authorship: [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Distribution requirements and known nuances are documented in [docs/LICENSING.md](docs/LICENSING.md).
 
@@ -182,4 +186,4 @@ Third-party components retain their licenses and authorship: [THIRD-PARTY-NOTICE
 
 Siemens, SIMATIC and STEP 7 are trademarks of Siemens AG or its affiliates. These names are used solely to identify compatibility with their respective products and technologies.
 
-Step7Project is an independent project and is not affiliated with, sponsored by, endorsed by, or officially supported by Siemens AG. All trademark rights remain with their respective owners.
+Step7ProjectExplorer is an independent project and is not affiliated with, sponsored by, endorsed by, or officially supported by Siemens AG. All trademark rights remain with their respective owners.

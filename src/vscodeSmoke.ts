@@ -30,7 +30,7 @@ export async function run(){
  assert.equal(contributions.views.step7project[0].name,locale==='ru'?'Управление проектом':'Project Controls');
  console.log('PASS vscode_localized_controls_are_separate_and_all_actions_are_visible');
  const settings=contributions.configuration.properties;
- assert.equal(contributions.viewsContainers.activitybar[0].title,'Step 7 Project Explorer');
+ assert.equal(contributions.viewsContainers.activitybar[0].title,'Step7ProjectExplorer');
  assert.deepEqual(settings['step7project.backup.mode'].enum,['off','everySave','1m','10m','30m','1h']);
  assert.equal(settings['step7project.backup.mode'].enumItemLabels[1],russian?'Каждое сохранение':'Every save');
  assert.equal(settings['step7project.projectPath.mode'].enumItemLabels[0],russian?'Относительный, если возможно':'Relative when possible');

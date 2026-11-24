@@ -116,10 +116,10 @@ class SymbolsEditor implements vscode.CustomTextEditorProvider {
  }
 }
 export async function activate(context:vscode.ExtensionContext){
- const out=vscode.window.createOutputChannel('Step7Project');
+ const out=vscode.window.createOutputChannel('Step7ProjectExplorer');
  const updateLanguage=()=>{const result=i18n.configureLanguage(context.extensionPath,config().get<string>('interface.language','auto'),vscode.env.language,config().get<string>('interface.customFile',''),path.join(context.globalStorageUri.fsPath,'language'));for(const error of result.errors)out.appendLine('Language: '+error);return result;};
  updateLanguage();
- const report=(e:unknown)=>{const message=e instanceof Error?e.message:String(e);out.appendLine(message);void vscode.window.showErrorMessage('Step7Project: '+message);};
+ const report=(e:unknown)=>{const message=e instanceof Error?e.message:String(e);out.appendLine(message);void vscode.window.showErrorMessage('Step7ProjectExplorer: '+message);};
  const pendingKey='navigation:'+vscode.env.sessionId;
  const backend=new Bridge(config().get<string>('backend.path')||undefined),tree=new Projects(backend,report,context.workspaceState.get<string>('activeProject'));
  const view=vscode.window.createTreeView('step7project.tree',{treeDataProvider:tree,showCollapseAll:true});
