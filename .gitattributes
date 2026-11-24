@@ -7,5 +7,5 @@
 *.ps1 text eol=crlf
 *.cmd text eol=crlf
 *.svg text eol=lf
-# Preserve upstream license formatting.
-third-party/** -whitespace
+# Preserve upstream license formatting and original bytes (including CRLF/BOM).
+third-party/** -whitespace -text

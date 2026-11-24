@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "reviewDate": "2026-11-24",
+  "issues": [
+    {
+      "id": "TOOLBOX-LICENSE",
+      "status": "open",
+      "component": "DotNetProjects.DotNetSiemensPLCToolBoxLibrary/4.4.10",
+      "reason": "NuGet declares MIT; pinned upstream LICENSE is LGPL 2.1, documentation contains LGPL 3, and managed source headers grant Library GPL version 2 or later. No sole-MIT conclusion is approved.",
+      "resolution": "Record authoritative clarification or an explicitly reviewed LGPL distribution basis, preserving the applicable notices and all embedded component rights.",
+      "evidence": "docs/LICENSING.md#toolbox"
+    },
+    {
+      "id": "TOOLBOX-DBF-PROVENANCE",
+      "status": "open",
+      "component": "DotNetProjects.DotNetSiemensPLCToolBoxLibrary/4.4.10",
+      "reason": "DBF/ParseDBF.cs credits a CodeProject article; upstream README attributes it to Brian Duke. The original article license could not be verified. CPOL or MIT must not be guessed.",
+      "resolution": "Preserve and verify the original grant for the incorporated DBF code, obtain permission, or replace the affected implementation with code of verified provenance.",
+      "evidence": "docs/LICENSING.md#toolbox"
+    },
+    {
+      "id": "TOOLBOX-CORRESPONDING-SOURCE",
+      "status": "open",
+      "component": "DotNetProjects.DotNetSiemensPLCToolBoxLibrary/4.4.10",
+      "reason": "Existing VSIX files contain the library DLL but not a reviewed corresponding-source distribution or a verified replacement/relink procedure. A GitHub link alone is not treated as satisfying LGPL distribution obligations.",
+      "resolution": "For an LGPL distribution, prepare matching complete library source, build/install instructions and a verified replacement/relink path, and deliver the required license texts and source access with the binary. Alternatively document a valid different grant covering all shipped code.",
+      "evidence": "docs/LICENSING.md#toolbox"
+    }
+  ]
+}

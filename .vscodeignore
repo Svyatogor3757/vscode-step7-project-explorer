@@ -4,6 +4,7 @@ S15-2026/**
 .scratch/**
 .gitignore
 node_modules/**
+third-party/development/**
 test/**
 tools/**
 src/**

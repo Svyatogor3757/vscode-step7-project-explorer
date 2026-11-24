@@ -39,6 +39,8 @@ npm run package
 
 Сохраняй точные native-идентификаторы, кодировки и границы CPU. Не делай успешным результат с частичной записью или потерянными данными. После ошибок обновляй журнал [docs/VERIFICATION.md](docs/VERIFICATION.md), а пользовательские изменения описывай в CHANGELOG.md.
 
+Оригинальный код принадлежит Cody ([Svyatogor3757](https://github.com/Svyatogor3757)) и распространяется по MIT. Сохраняй copyright и полный LICENSE; чужие библиотеки не перелицензируются корневым MIT. Перед обновлением зависимостей или выпуском прочитай [docs/LICENSING.md](docs/LICENSING.md), проверь [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) и выполни `npm run licenses:audit` / `npm run licenses:check`. Открытые вопросы Toolbox в `third-party/release-review.json` блокируют упаковку. Не удаляй findings и не отключай проверку ради выпуска; для закрытия нужны документированные основания, а для LGPL — выполненные обязанности по поставке и проверке замены/пересборки библиотеки. `licenses:inventory` обновляет факты, но не одобряет условия. Не включай `node_modules`, signing tools, Siemens DLL и примеры в VSIX. Сохраняй оригинальные legal-файлы без переформатирования.
+
 ## Почему инструкция устроена так
 
 Корневой файл содержит короткий рабочий процесс и команды, подробности вынесены по ссылкам. Это соответствует назначению [AGENTS.md](https://agents.md/) и [официальной инструкции Codex](https://learn.chatgpt.com/docs/agent-configuration/agents-md). Сам AGENTS.md объясняет доступные инструменты; он не регистрирует новые инструменты модели. VS Code предоставляет отдельные [Language Model Tools](https://code.visualstudio.com/api/extension-guides/ai/tools), но текущая версия использует совместимые с терминальными агентами файлы и CLI.
