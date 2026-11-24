@@ -6,6 +6,9 @@
 
 ## 0.1.5 – 2026-11-25
 
+- Added an extension-card icon, rasterized at 256×256 from the existing step7.svg. The sidebar keeps the original SVG icon.
+- Reworked the repository landing page with concise EN/RU introductions, release/license/platform badges, quick links and a real demonstration screenshot. Updated GitHub About with a short description, search topics and a quick-start documentation link.
+
 - Refined the extension category to Programming Languages and added Siemens, STEP 7, SCL, AWL/STL, PLC, project-explorer and AI-workflow search keywords. Repository, homepage, issues and MIT license metadata are retained; no new prominent README link section is added.
 - Clarified why the editable project view exists: work with code and references in VS Code, and use AI agents for study, review, creation and refinement. Updated both README introductions and replaced their em dashes with en dashes.
 - Renamed the displayed product to Step7ProjectExplorer in the README files, extension settings, explorer, diagnostics and generated agent guide. Highlighted VS Code and AI workflows in both introductions and mentioned Remote SSH; the Russian text is the reference for the English version.

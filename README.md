@@ -2,15 +2,24 @@
 
 **English** | [Русский](README.ru.md)
 
-Step7ProjectExplorer is a **VS Code extension that makes editing STEP 7 Classic project code more convenient**. It complements Siemens' standard tools with project-wide search, multi-file editing, Git diffs and VS Code extensions for working with code. Hardware, networks and other project settings remain in Siemens' standard applications. Sources, blocks and symbols share one workspace, where you can inspect dependencies through code references and update them alongside the program.
+[![Latest release](https://img.shields.io/github/v/release/Svyatogor3757/vscode-step7-project-explorer)](https://github.com/Svyatogor3757/vscode-step7-project-explorer/releases/latest)
+[![Project license: MIT](https://img.shields.io/badge/project_license-MIT-green)](LICENSE)
+![VS Code 1.95+](https://img.shields.io/badge/VS_Code-1.95%2B-blue)
+![Windows](https://img.shields.io/badge/platform-Windows-blue)
 
-To make this possible, the extension creates an **editable project view**: a separate directory containing sources, symbol tables and block representations as ordinary UTF-8 files. You edit these files in VS Code, check your changes on a temporary project copy, then apply them to the original through STEP 7. Changes to block interfaces and dependencies require consistency checks in STEP 7.
+[Quick start](#quick-start) · [Agent guide](docs/AGENT-USAGE.md) · [Releases](https://github.com/Svyatogor3757/vscode-step7-project-explorer/releases) · [Report a bug](https://github.com/Svyatogor3757/vscode-step7-project-explorer/issues)
 
-The extension's second purpose is **AI-assisted study, code review, creation and refinement**. Codex or another agent with file and terminal access can study the project, trace references, propose edits, create supported sources and check the result through the CLI. Give the agent a file path from the tree; the generated AGENTS.md explains how to check and apply changes.
+Step7ProjectExplorer is a **VS Code extension for editing STEP 7 Classic project code**. Sources, blocks and symbols share one workspace: search code and references, edit multiple files and compare changes with Git.
 
-The extension works with **Sources, Symbols and Blocks** for **STEP 7 V5.5 SP3 / S7-300 on Windows**. Some blocks and symbol tables are read-only; the tree and CLI show why. Hardware configuration, NetPro, connections and PLC downloads remain in STEP 7.
+The extension creates an **editable view of the original project** – a directory of UTF-8 files for ordinary editing tools. Changes are checked on a temporary copy and written to the original through a separate Apply Changes command.
 
-You can also work through **VS Code Remote SSH**, connecting to a Windows host with STEP 7 and the extension installed.
+These files also let **AI agents study, review, create and refine code**. Give Codex a file path; changes are checked through the CLI following the instructions in AGENTS.md.
+
+Supports **Sources, Symbols and Blocks** for **STEP 7 V5.5 SP3 / S7-300 on Windows**, including **VS Code Remote SSH**. Some objects are read-only. Hardware, networks, connections and PLC downloads remain in Siemens' standard applications.
+
+![Step7ProjectExplorer with the project tree expanded to sources, symbols and blocks beside the SCL editor](media/overview.png)
+
+Project tree and SCL editor with a demonstration project.
 
 ## Quick start
 

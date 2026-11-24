@@ -1,6 +1,7 @@
 {
   "name": "step7project",
   "displayName": "Step7ProjectExplorer",
+  "icon": "media/step7.png",
   "description": "%extension.description%",
   "version": "0.1.5",
   "publisher": "step7project",
