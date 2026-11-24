@@ -10,6 +10,8 @@
 
 Локально проверены ссылки девяти contribution-документов, взаимные EN/RU ссылки, порядок секций README, CODEOWNERS и `git diff --check`. Программный код, зависимости, опубликованные теги и сборки не менялись. Конфигурация проверена через действующие GitHub branch rules; разрушительные попытки удаления main или force-push не выполнялись. Файлы подготавливаются через отдельную ветку и настоящий PR, чтобы проверить полный путь CI/слияния при включённой защите.
 
+Создан [PR #1](https://github.com/Svyatogor3757/vscode-step7-project-explorer/pull/1) из chore/contribution-workflow в main. При незавершённом CI сервер показывал mergeable_state=blocked. [Windows CI на 51924b9](https://github.com/Svyatogor3757/vscode-step7-project-explorer/actions/runs/45429799551) завершился success; GitHub Codeowners errors API для этой ветки вернул `errors: []`. Подтверждено отсутствие изменений LICENSE, THIRD-PARTY-NOTICES.md и release-review.json. Эта запись добавлена в тот же PR до финального слияния, а не прямым push в защищённый main.
+
 ## Окончательная 0.1.5 опубликована – 2026-11-25
 
 Все поздние правки README, screenshot и icon сохранены коммитом `02c822096b81ff5f0ac59411b29e2a40927ccf4c`. По явному разрешению владельца тег v0.1.5 обновлён с прежнего объекта `bdf0adbfc430e04189094de4be80da19475d885a` на `4f4ae5f`, указывающий на этот commit. Отправка main/tag выполнена атомарно с адресным force-with-lease старого объекта тега. Старый неопубликованный draft 456923270 и его два assets предварительно скопированы локально с проверкой digest; затем заменён только этот черновик. Публичные 0.1.0–0.1.4 не изменялись.
