@@ -144,3 +144,17 @@ Backend собирается как **x86**, поскольку STEP 7 V5.x Comm
 | `package.json` | Обязательный манифест расширения: команды, настройки, сборка и заявленные зависимости. Генератор обновляет в нём список встроенных языков и подписи вариантов настроек. |
 | `package-lock.json` | Точные версии и контрольные суммы полного дерева npm-зависимостей для воспроизводимого `npm ci`. Это не копия манифеста. |
 | `package.nls.json`, `package.nls.ru.json` | Сгенерированные словари для команд и настроек, которые читает сам VS Code. Имена и расположение определяются его форматом; редактируемые переводы находятся в `language/`. |
+
+## Лицензия
+
+Оригинальный код Step7Project распространяется по [лицензии MIT](LICENSE). Автор — **Cody** ([Svyatogor3757](https://github.com/Svyatogor3757)). При распространении копий или существенных частей кода сохраняйте copyright и полный текст лицензии.
+
+Сторонние компоненты сохраняют собственные лицензии и авторство: [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Условия поставки и известные нюансы описаны в [docs/LICENSING.md](docs/LICENSING.md).
+
+## Disclaimer / Товарные знаки и независимость проекта
+
+Siemens, SIMATIC и STEP 7 — товарные знаки Siemens AG или её аффилированных компаний. Эти названия используются в проекте исключительно для обозначения совместимости с соответствующими продуктами и технологиями.
+
+Step7Project — независимый проект. Он не связан с Siemens AG, не спонсируется, не одобряется и официально не поддерживается этой компанией. Все права на упомянутые товарные знаки принадлежат соответствующим правообладателям.
+
+Siemens, SIMATIC and STEP 7 are trademarks of Siemens AG or its affiliates. These names are used solely to identify compatibility with their respective products and technologies. Step7Project is an independent project and is not affiliated with, sponsored by, endorsed by, or officially supported by Siemens AG. All trademark rights remain with their respective owners.
