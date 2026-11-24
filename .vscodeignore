@@ -5,6 +5,7 @@ S15-2026/**
 .gitignore
 node_modules/**
 third-party/development/**
+[Rr]eleases/**
 test/**
 tools/**
 src/**

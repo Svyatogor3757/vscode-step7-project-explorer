@@ -35,10 +35,12 @@
     "step7project": "./bin/step7project.cjs"
   },
   "scripts": {
-    "compile": "tsc -p .",
+    "compile": "npm run languages:generate && tsc -p .",
+    "languages:generate": "node tools/generate-language.cjs",
     "build:backend": "dotnet build backend/Step7Bridge.csproj -c Release -o backend/bin",
     "test": "npm run compile && node --test test/*.test.cjs",
-    "package": "vsce package --no-dependencies --allow-missing-repository --no-rewrite-relative-links",
+    "prepackage": "node -e \"require('node:fs').mkdirSync('releases',{recursive:true})\"",
+    "package": "vsce package --out releases/ --no-dependencies --allow-missing-repository --no-rewrite-relative-links",
     "vscode:prepublish": "npm run build:backend && npm run compile && npm run licenses:check",
     "licenses:inventory": "node tools/licenses.cjs --write",
     "licenses:audit": "node tools/licenses.cjs",
@@ -78,6 +80,10 @@
       ]
     },
     "commands": [
+      {
+        "command": "step7project.chooseLanguage",
+        "title": "%command.chooseLanguage%"
+      },
       {
         "command": "step7project.showControls",
         "title": "%command.showControls%",
@@ -252,6 +258,12 @@
     "configuration": {
       "title": "Step7Project",
       "properties": {
+        "step7project.interface.customFile": {
+          "type": "string",
+          "scope": "machine",
+          "default": "",
+          "description": "%setting.step7project.interface.customFile%"
+        },
         "step7project.awl.mnemonics": {
           "type": "string",
           "enum": [
@@ -261,6 +273,10 @@
           "default": "english",
           "description": "%setting.step7project.awl.mnemonics%",
           "enumDescriptions": [
+            "%enum.step7project.awl.mnemonics.0%",
+            "%enum.step7project.awl.mnemonics.1%"
+          ],
+          "enumItemLabels": [
             "%enum.step7project.awl.mnemonics.0%",
             "%enum.step7project.awl.mnemonics.1%"
           ]
@@ -278,6 +294,14 @@
           "default": "everySave",
           "description": "%setting.step7project.backup.mode%",
           "enumDescriptions": [
+            "%enum.step7project.backup.mode.0%",
+            "%enum.step7project.backup.mode.1%",
+            "%enum.step7project.backup.mode.2%",
+            "%enum.step7project.backup.mode.3%",
+            "%enum.step7project.backup.mode.4%",
+            "%enum.step7project.backup.mode.5%"
+          ],
+          "enumItemLabels": [
             "%enum.step7project.backup.mode.0%",
             "%enum.step7project.backup.mode.1%",
             "%enum.step7project.backup.mode.2%",
@@ -304,6 +328,11 @@
             "%enum.step7project.symbols.editor.0%",
             "%enum.step7project.symbols.editor.1%",
             "%enum.step7project.symbols.editor.2%"
+          ],
+          "enumItemLabels": [
+            "%enum.step7project.symbols.editor.0%",
+            "%enum.step7project.symbols.editor.1%",
+            "%enum.step7project.symbols.editor.2%"
           ]
         },
         "step7project.symbols.format": {
@@ -313,7 +342,11 @@
             "asc"
           ],
           "default": "csv",
-          "description": "%setting.step7project.symbols.format%"
+          "description": "%setting.step7project.symbols.format%",
+          "enumItemLabels": [
+            "%enum.step7project.symbols.format.0%",
+            "%enum.step7project.symbols.format.1%"
+          ]
         },
         "step7project.backend.path": {
           "type": "string",
@@ -331,6 +364,28 @@
           "enumDescriptions": [
             "%enum.projectPath.relative%",
             "%enum.projectPath.absolute%"
+          ],
+          "enumItemLabels": [
+            "%enum.projectPath.relative%",
+            "%enum.projectPath.absolute%"
+          ]
+        },
+        "step7project.interface.language": {
+          "type": "string",
+          "scope": "window",
+          "default": "auto",
+          "description": "%setting.step7project.interface.language%",
+          "enum": [
+            "auto",
+            "en_us",
+            "ru_ru",
+            "custom"
+          ],
+          "enumItemLabels": [
+            "%language.auto%",
+            "%language.name.en_us%",
+            "%language.name.ru_ru%",
+            "%language.custom%"
           ]
         }
       }
@@ -374,6 +429,5 @@
         "contents": "%view.welcome%"
       }
     ]
-  },
-  "l10n": "./l10n"
+  }
 }

@@ -41,5 +41,14 @@
   "command.revealLocationInWorkspace": "Показать в проводнике VS Code",
   "setting.step7project.projectPath.mode": "Путь к нативному проекту в новых представлениях. Относительный путь позволяет переносить обе папки вместе; между разными дисками нужен абсолютный. Для существующих: CLI configure --project-path relative|absolute.",
   "enum.projectPath.relative": "Относительный, если возможно",
-  "enum.projectPath.absolute": "Абсолютный"
+  "enum.projectPath.absolute": "Абсолютный",
+  "setting.step7project.interface.language": "Язык дерева, диалогов и таблицы Symbols. По умолчанию — как в VS Code. Для личного перевода используйте команду «Выбрать язык интерфейса» и импорт файла. Стандартные команды и настройки VS Code следуют языку среды. Уже открытую таблицу Symbols нужно открыть заново.",
+  "language.auto": "Как в VS Code",
+  "enum.step7project.symbols.format.0": "CSV — таблица с разделителями",
+  "enum.step7project.symbols.format.1": "ASC — таблица STEP 7",
+  "command.chooseLanguage": "Выбрать язык интерфейса",
+  "language.custom": "Пользовательский перевод из файла",
+  "setting.step7project.interface.customFile": "Файл пользовательского перевода interface_*.json. Можно импортировать без сборки командой «Выбрать язык интерфейса». Отсутствующие строки берутся из английского перевода.",
+  "language.name.en_us": "English (en_us)",
+  "language.name.ru_ru": "Русский (ru_ru)"
 }

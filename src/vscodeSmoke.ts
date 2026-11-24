@@ -29,6 +29,23 @@ export async function run(){
  const contributions=extension.packageJSON.contributes;assert.deepEqual(contributions.views.step7project.map((v:{id:string})=>v.id),['step7project.controls','step7project.tree']);
  assert.equal(contributions.views.step7project[0].name,locale==='ru'?'Управление проектом':'Project Controls');
  console.log('PASS vscode_localized_controls_are_separate_and_all_actions_are_visible');
+ const settings=contributions.configuration.properties;
+ assert.deepEqual(settings['step7project.backup.mode'].enum,['off','everySave','1m','10m','30m','1h']);
+ assert.equal(settings['step7project.backup.mode'].enumItemLabels[1],russian?'Каждое сохранение':'Every save');
+ assert.equal(settings['step7project.projectPath.mode'].enumItemLabels[0],russian?'Относительный, если возможно':'Relative when possible');
+ assert.equal(settings['step7project.symbols.editor'].enumItemLabels[0],russian?'Таблица':'Table');
+ assert.deepEqual(settings['step7project.interface.language'].enum,['auto','en_us','ru_ru','custom']);assert(registered.includes('step7project.chooseLanguage'));
+ console.log('PASS vscode_settings_show_translated_enum_labels_and_discovered_languages');
+ const configuration=vscode.workspace.getConfiguration('step7project'),priorLanguage=configuration.inspect('interface.language')?.workspaceValue,priorFile=configuration.inspect('interface.customFile')?.globalValue;
+ async function setLanguage(value:string|undefined,title:string){await configuration.update('interface.language',value,vscode.ConfigurationTarget.Workspace);for(let i=0;i<50&&api.getViewState().project.title!==title;i++)await new Promise(r=>setTimeout(r,100));assert.equal(api.getViewState().project.title,title);}
+ try{
+  await setLanguage('en_us','Project');assert.equal(controlProvider.getChildren().find(item=>item.id==='open')!.label,'Open Project');
+  await setLanguage('ru_ru','Проект');assert.equal(controlProvider.getChildren().find(item=>item.id==='open')!.label,'Открыть проект');
+  const customFile=path.join(workspace,'interface_de_de.json');fs.writeFileSync(customFile,JSON.stringify({name:'Deutsch test',vscodeLocale:'de',messages:{Project:'Projekt test'}}));
+  await configuration.update('interface.customFile',customFile,vscode.ConfigurationTarget.Global);await setLanguage('custom','Projekt test');
+  assert.equal(controlProvider.getChildren().find(item=>item.id==='refresh')!.label,'Refresh');
+ }finally{await configuration.update('interface.customFile',priorFile,vscode.ConfigurationTarget.Global);await setLanguage(priorLanguage as string|undefined,russian?'Проект':'Project');}
+ console.log('PASS vscode_language_override_and_partial_custom_translation_refresh_live');
  const native=items.find(item=>item.id==='native')!,representation=items.find(item=>item.id==='representation')!;
  assert.equal(native.tooltip,w.manifest.project);assert.equal(native.command!.arguments![0].workspace.root,w.root);assert.equal(native.command!.command,'step7project.revealNative');
  assert.equal(representation.tooltip,w.root);assert.equal(representation.command!.command,'step7project.revealView');
@@ -92,5 +109,5 @@ export async function run(){
  console.log('PASS vscode_removed_view_folder_closes_connection_and_explicit_open_reconnects');
  await vscode.commands.executeCommand('workbench.action.closeAllEditors');
  controlProvider.dispose();projects.dispose();
- fs.writeFileSync(path.join(workspace,'ui-test-results.json'),JSON.stringify({locale,passed:['vscode_controls_focus_reveals_group_without_project_banner','vscode_discovers_nested_project_views_and_ignores_backups','vscode_generated_launcher_uses_current_extension_host','vscode_localized_controls_are_separate_and_all_actions_are_visible','vscode_active_project_controls_show_native_and_view_locations','vscode_project_location_context_menu_copies_correct_paths','vscode_opens_real_scl_document','vscode_save_creates_previous_version_backup','vscode_opens_symbols_custom_editor','vscode_symbols_open_as_text_uses_same_file','vscode_read_only_document_uses_content_provider','vscode_read_only_view_refreshes_after_export','vscode_native_and_view_links_open_explorer_and_keep_existing_roots','vscode_view_link_reuses_more_specific_workspace_root','vscode_removing_specific_root_keeps_project_under_open_parent','vscode_removed_view_folder_closes_connection_and_explicit_open_reconnects']},null,2));
+ fs.writeFileSync(path.join(workspace,'ui-test-results.json'),JSON.stringify({locale,passed:['vscode_settings_show_translated_enum_labels_and_discovered_languages','vscode_language_override_and_partial_custom_translation_refresh_live','vscode_controls_focus_reveals_group_without_project_banner','vscode_discovers_nested_project_views_and_ignores_backups','vscode_generated_launcher_uses_current_extension_host','vscode_localized_controls_are_separate_and_all_actions_are_visible','vscode_active_project_controls_show_native_and_view_locations','vscode_project_location_context_menu_copies_correct_paths','vscode_opens_real_scl_document','vscode_save_creates_previous_version_backup','vscode_opens_symbols_custom_editor','vscode_symbols_open_as_text_uses_same_file','vscode_read_only_document_uses_content_provider','vscode_read_only_view_refreshes_after_export','vscode_native_and_view_links_open_explorer_and_keep_existing_roots','vscode_view_link_reuses_more_specific_workspace_root','vscode_removing_specific_root_keeps_project_under_open_parent','vscode_removed_view_folder_closes_connection_and_explicit_open_reconnects']},null,2));
 }

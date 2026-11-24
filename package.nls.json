@@ -41,5 +41,14 @@
   "command.revealLocationInWorkspace": "Show in VS Code Explorer",
   "setting.step7project.projectPath.mode": "Native project path stored in new project views. Relative paths support moving both folders together; different drives require an absolute path. Existing views: CLI configure --project-path relative|absolute.",
   "enum.projectPath.relative": "Relative when possible",
-  "enum.projectPath.absolute": "Absolute"
+  "enum.projectPath.absolute": "Absolute",
+  "setting.step7project.interface.language": "Language of the tree, dialogs and Symbols table. Defaults to VS Code. Use Choose Interface Language to import a personal translation file. Native VS Code commands and settings follow the editor display language. Reopen an existing Symbols editor after changing the language.",
+  "language.auto": "Follow VS Code",
+  "enum.step7project.symbols.format.0": "CSV — comma-separated table",
+  "enum.step7project.symbols.format.1": "ASC — STEP 7 table",
+  "command.chooseLanguage": "Choose Interface Language",
+  "language.custom": "Custom translation from file",
+  "setting.step7project.interface.customFile": "Custom interface_*.json translation. Import without rebuilding with Choose Interface Language. Missing text falls back to English.",
+  "language.name.en_us": "English (en_us)",
+  "language.name.ru_ru": "Русский (ru_ru)"
 }

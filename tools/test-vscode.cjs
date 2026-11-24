@@ -23,7 +23,7 @@ const {Workspace}=require('../dist/workspace'),{toAsc}=require('../dist/symbols'
  const args=['-NoProfile','-ExecutionPolicy','Bypass','-File',path.join(root,'tools/run-vscode.ps1'),'-CodePath','C:/Program Files/Microsoft VS Code/Code.exe','-WorkspacePath',workspaceFile,'-TestsPath',path.join(root,'dist/vscodeSmoke.js'),'-ExtensionPath',root,'-UserData',path.join(temp,'profile'),'-Locale',locale];
  const env={...process.env,STEP7PROJECT_TEST_LOCALE:locale};delete env.ELECTRON_RUN_AS_NODE;
  if(process.argv.includes('--upgrade')){
-  const oldPackage=process.env.STEP7PROJECT_UPGRADE_VSIX||path.join(root,'step7project-0.1.0.vsix'),destination=path.join(temp,'original-extension');
+  const oldPackage=process.env.STEP7PROJECT_UPGRADE_VSIX||path.join(root,'releases','step7project-0.1.0.vsix'),destination=path.join(temp,'original-extension');
   if(!fs.existsSync(oldPackage))throw Error('Set STEP7PROJECT_UPGRADE_VSIX to the original 0.1.0 VSIX');
   const extracted=spawnSync('powershell.exe',['-NoProfile','-File',path.join(root,'tools/extract-upgrade-fixture.ps1'),'-Package',oldPackage,'-Destination',destination],{stdio:'inherit',env});if(extracted.status)throw Error('Could not extract upgrade fixture');
   const seed=[...args];seed[seed.indexOf('-TestsPath')+1]=path.join(root,'dist/vscodeUpgradeSeed.js');seed[seed.indexOf('-ExtensionPath')+1]=path.join(destination,'extension');

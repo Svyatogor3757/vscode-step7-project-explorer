@@ -27,6 +27,7 @@ Step7Project — Windows-расширение VS Code для STEP 7 Classic V5.5
 - `src/` — TypeScript: дерево, редактор symbols, рабочий каталог, резервирование, CLI.
 - `backend/` — .NET Framework 4.8 x86: чтение через DotNetSiemensPLCToolBoxLibrary и запись через STEP 7 Command Interface. `Invoke-Bridge.ps1` запускает native-компиляторы в интерактивном Windows-сеансе при Remote SSH.
 - `test/` — Node built-in tests; `tools/` — воспроизводимые проверки VM. `Examples/` и оставшийся `S-15/` — игнорируемые пользовательские примеры.
+- `language/interface_*.json` — исходники переводов, включая стандартный `en_us` и русский `ru_ru`. Корневые `package.nls*.json` генерируются командой `npm run languages:generate`; не редактируй их вручную. Неполные переводы используют английский fallback; сохраняй подстановки. Пользовательский импорт не требует пересборки: [language/README.md](language/README.md). VSIX выводится в `releases/`.
 
 ```powershell
 npm ci

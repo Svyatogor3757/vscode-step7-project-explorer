@@ -1,5 +1,22 @@
 # Проверки и ограничения
 
+## Языки интерфейса и каталог сборок — 2026-11-24 (Unreleased)
+
+Исходники переводов: `language/interface_en_us.json`, `language/interface_ru_ru.json`; `l10n/` удалён. Генератор находит `interface_*.json`, создаёт стандартные `package.nls*.json`, добавляет встроенные языки в schema настройки, дополняет неполные manifest-переводы английскими строками и удаляет только прежние сгенерированные файлы. Runtime использует тот же валидатор. Пользовательский импорт проверяет файл и копирует исходные байты в globalStorage расширения; подтверждение требуется только при замене отличающегося содержимого. Неизвестные строки и отсутствующие ключи используют английский fallback. Нативные пункты VS Code остаются на языке среды; открытый Symbols editor нужно переоткрыть.
+
+| Требование | Проверка |
+| --- | --- |
+| Обнаружение языков и стандартные файлы VS Code | `languages_generate_settings_from_discovered_files`: временный неполный de_de добавляется в schema и package.nls.de.json; отсутствующая команда дополняется английской. `languages_remove_only_stale_generated_files_and_reject_unsafe_index` проверяет удаление языка и защиту выходных путей. |
+| Переведённые подписи настроек | `languages_translate_setting_labels_without_changing_stored_values` проверяет все enumItemLabels и совместимость значений. `vscode_settings_show_translated_enum_labels_and_discovered_languages` проверяет реальные локализованные contributions в EN/RU Extension Host. |
+| Выбор языка и неполные переводы | `languages_select_environment_region_override_and_english_fallback`, `languages_partial_translation_uses_standard_english_per_key`, `languages_runtime_custom_file_supports_partial_translation_and_invalid_file_fallback`. `vscode_language_override_and_partial_custom_translation_refresh_live` проверяет живой переход English → Russian → частичный пользовательский German → исходный язык. |
+| Импорт без сборки | `languages_import_preserves_partial_file_bytes_and_discovers_saved_translation`, `languages_import_cancel_preserves_saved_file_and_confirm_replaces_it`, `languages_invalid_import_does_not_create_saved_translation`: фактическая запись в TEMP, обнаружение копии, сохранение BOM/CRLF, отмена и подтверждение замены, отсутствие записи после ошибки. Native file picker и клики пользователя по импорту автоматически не воспроизводились. |
+
+`npm test`: **81/81**, exit 0. `node tools/test-vscode.cjs`: **18/18**, английский профиль, TEMP `SPB-vscode-4BBYXj`. `node tools/test-vscode.cjs --ru --upgrade`: **18/18**, русский профиль после seed 0.1.0 из `releases/`, TEMP `SPB-vscode-STRbj4`. Первое имя fixture `interface_RU_RU.json` на Windows совпало с существующим ru_ru; тест исправлен на отдельный DE_DE, отклонение неверного регистра подтверждено. Попытка обычного запуска Node runner встретила sandbox `spawn EPERM`; повторный разрешённый запуск прошёл. Проверка assertions/gaps: есть точные значения и side effects, успешные и отрицательные сценарии; временных мутаций кода не оставлено.
+
+`npm run package` создаёт каталог `releases/` и передаёт его в `vsce --out`. Backend Release x86 и TypeScript успешно собираются; затем ожидаемый exit 1 на прежних открытых вопросах Toolbox. Новый VSIX не создан, старые пакеты не перезаписаны. `vsce ls --no-dependencies` включает новые language-файлы и dist/localization.js, не включает старый l10n, исходники, тесты, node_modules и архивы releases. Инвентарь лицензий по-прежнему проходит техническую сверку; разрешение на распространение Toolbox не объявляется полученным.
+
+Изменений backend и native-операций в этой задаче нет; VM и ПЛК не использовались.
+
 ## Лицензионный аудит — 2026-11-24 (Unreleased)
 
 Оформлена MIT для оригинального кода: Cody, https://github.com/Svyatogor3757. MIT проекта не распространяется на чужие компоненты и пользовательские PLC-проекты. Подробности и первичные источники: [LICENSING.md](LICENSING.md), [THIRD-PARTY-NOTICES.md](../THIRD-PARTY-NOTICES.md).
