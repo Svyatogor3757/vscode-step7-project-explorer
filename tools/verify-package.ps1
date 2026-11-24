@@ -15,6 +15,8 @@ $sourceManifest=Get-Content 'package.json' -Raw | ConvertFrom-Json
 if($packagedManifest.version -ne $sourceManifest.version -or $packagedManifest.name -ne $sourceManifest.name -or $packagedManifest.publisher -ne $sourceManifest.publisher) {throw 'Packaged identity differs from the source manifest'}
 foreach($legal in @('LICENSE','AUTHORS.md','THIRD-PARTY-NOTICES.md','third-party/inventory.json','README.md','README.ru.md','CHANGELOG.md','CHANGELOG.ru.md')) {
  $packaged=Join-Path $extension $legal
+ # VSCE packages the root LICENSE as LICENSE.txt; old fixtures use LICENSE.
+ if($legal -eq 'LICENSE' -and !(Test-Path -LiteralPath $packaged)) {$packaged=Join-Path $extension 'LICENSE.txt'}
  if(!(Test-Path -LiteralPath $packaged)) {throw ('Missing packaged legal/documentation file: '+$legal)}
  if((Get-FileHash -LiteralPath $packaged -Algorithm SHA256).Hash -ne (Get-FileHash -LiteralPath $legal -Algorithm SHA256).Hash) {throw ('Packaged file differs from source: '+$legal)}
 }

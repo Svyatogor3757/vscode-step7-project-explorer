@@ -4,6 +4,10 @@
 
 ## Unreleased
 
+## 0.1.4 — 2026-11-24
+
+- Fixed archive verification for VSCE's standard LICENSE.txt filename while preserving checks for modified or missing license text.
+- Local VSIX packaging now runs the technical license audit without requiring completion of the separate distribution review. Original code remains MIT; dependency licenses, notices and open findings are retained. Tag automation prepares drafts for review and does not publish them.
 - Reworked both README openings around the editable view of an original STEP 7 project, a quick start with explicit view-folder placement, and a feature overview. Kept the Step 7 Project Explorer name in English across interface languages.
 - Fixed Windows PowerShell child environments inherited through Node from PowerShell 7, preventing legacy module-autoload failures in the native bridge and test harnesses.
 
@@ -18,7 +22,7 @@
 - Attributed original MIT code to Cody / Svyatogor3757; added AUTHORS.md, licensing guidance and dependency attribution.
 - Preserved complete upstream license/notice files and a separate development-tool collection. Added NuGet/npm inventory and DLL/legal-file hashes; development-only notices are excluded from VSIX.
 - Disabled Git text normalization for third-party legal files to preserve original CRLF/BOM bytes and checksums.
-- Pinned Toolbox 4.4.10 source as a submodule. Documented per-component MIT/LGPL/Library GPL/CPOL notices and nuances. Identified the original Brian Duke DBF code as CPOL 1.02 from archived primary sources and preserved the license. Compatibility and corresponding-source distribution remain unconfirmed; new release packaging is blocked pending documented resolution. Local compilation and tests remain available.
+- Pinned Toolbox 4.4.10 source as a submodule. Documented per-component MIT/LGPL/Library GPL/CPOL notices and nuances. Identified the original Brian Duke DBF code as CPOL 1.02 from archived primary sources and preserved the license. Compatibility and corresponding-source distribution remain open review items; creating a local VSIX does not resolve them.
 
 ## 0.1.3 — 2026-11-24
 

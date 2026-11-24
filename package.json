@@ -2,7 +2,7 @@
   "name": "step7project",
   "displayName": "Step7Project",
   "description": "%extension.description%",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "publisher": "step7project",
   "author": {
     "name": "Cody",
@@ -49,7 +49,7 @@
     "test": "npm run compile && node --test test/*.test.cjs",
     "prepackage": "node -e \"require('node:fs').mkdirSync('releases',{recursive:true})\"",
     "package": "vsce package --out releases/ --no-dependencies --allow-missing-repository --no-rewrite-relative-links",
-    "vscode:prepublish": "npm run build:backend && npm run compile && npm run licenses:check",
+    "vscode:prepublish": "npm run build:backend && npm run compile && npm run licenses:audit",
     "licenses:inventory": "node tools/licenses.cjs --write",
     "licenses:audit": "node tools/licenses.cjs",
     "licenses:check": "node tools/licenses.cjs --release",

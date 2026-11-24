@@ -2,7 +2,7 @@
   "schema": 1,
   "reviewDate": "2026-11-24",
   "description": "Dependency inventory, not a legal clearance or a CycloneDX/SPDX SBOM. Third-party licenses do not change under the root MIT license.",
-  "packageLockSha256": "5e38c92b73264db22e6f7a2a63d50ff2a3918967fe10ef933f292e98bc9097a6",
+  "packageLockSha256": "67e66a712a92bc2fc6147d37bf0333744de61e86582086b6a9c228174f0f4003",
   "nuget": [
     {
       "name": "DotNetProjects.DotNetSiemensPLCToolBoxLibrary",

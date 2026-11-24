@@ -10,7 +10,7 @@ AI agents can work with the same files and CLI. Copy a path from the tree, give 
 
 ## Quick start
 
-Install a VSIX using **Extensions → … → Install from VSIX**, then open **Step 7 Project Explorer**. Local packages are kept in `releases/`; historical GitHub builds are currently drafts pending the [licensing review](docs/LICENSING.md). Unreleased changes described here are in the current source tree. After updating an installation, run **Developer: Reload Window**.
+Install a VSIX using **Extensions → … → Install from VSIX**, then open **Step 7 Project Explorer**. The local 0.1.4 package is `releases/step7project-0.1.4.vsix`. Original code is MIT; dependencies retain their [own licenses and review notes](THIRD-PARTY-NOTICES.md). Historical GitHub builds are drafts. After updating an installation, run **Developer: Reload Window**.
 
 1. In **Project Controls**, choose **Open Project** and select the original STEP 7 project file, for example `D:\PLC\Plant\Plant.s7p`.
 2. In the next dialog, select the **folder in which to store the project view**. The extension creates `<project-name>-code` inside it. For example, selecting `D:\Code` creates `D:\Code\Plant-code`. This is the editable view directory, separate from the original project.
@@ -148,7 +148,7 @@ npm run licenses:audit
 npm run package
 ```
 
-`licenses:audit` verifies the inventory and reports open items. Packaging also runs `licenses:check`, which blocks a release while licensing findings remain open. See [docs/LICENSING.md](docs/LICENSING.md) for dependency maintenance and resolution requirements.
+Packaging runs `licenses:audit`: technical inventory mismatches fail the build, while open legal review items are reported and retained. `licenses:check` is a separate strict distribution-review command. Creating a local VSIX does not change dependency licenses or resolve those items. See [docs/LICENSING.md](docs/LICENSING.md).
 
 The backend targets **x86** because the STEP 7 V5.x Command Interface is 32-bit; see [Siemens V5.5 SP4 README, Command Interface](https://support.industry.siemens.com/cs/attachments/93842005/README.pdf). The project targets V5.5 SP3, rather than TIA Openness.
 

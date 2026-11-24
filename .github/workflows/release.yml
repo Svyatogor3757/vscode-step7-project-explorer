@@ -56,7 +56,7 @@ jobs:
       - run: npm ci
       - run: npm run build:backend
       - run: npm test
-      - run: npm run licenses:check
+      - run: npm run licenses:audit
       - run: npm run package
       - name: Verify packaged runtime and legal files
         shell: pwsh

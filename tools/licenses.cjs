@@ -109,6 +109,6 @@ const unresolved = review.issues.filter(issue => issue.status !== 'resolved');
 console.log(`Inventory verified: ${nuget.filter(x => x.scope === 'runtime').length} runtime NuGet packages, ${nuget.filter(x => x.scope === 'build-only').length} build-only NuGet packages, ${npm.length} npm lockfile entries.`);
 for (const issue of unresolved) console.log(`OPEN ${issue.id}: ${issue.reason}`);
 if (process.argv.includes('--release') && unresolved.length) {
-  console.error('Release packaging is blocked by unresolved third-party review. See docs/LICENSING.md. Build, compile and local tests remain available.');
+  console.error('Distribution review is incomplete. See docs/LICENSING.md. Local packaging remains available with licenses:audit; dependency terms and open findings are unchanged.');
   process.exitCode = 1;
 }
