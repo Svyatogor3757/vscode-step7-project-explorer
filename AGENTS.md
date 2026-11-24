@@ -1,35 +1,36 @@
-# Step7Project: инструкция для ИИ-агентов
+# Step7Project: instructions for AI agents
 
-## Как пользоваться инструментом
+## Using the tool
 
-Step7Project — Windows-расширение VS Code для STEP 7 Classic V5.5 SP3 / S7-300. Основной интерфейс для агента — обычные UTF-8-файлы экспортированного рабочего каталога и CLI. Отдельной интеграции с конкретной моделью не требуется.
+Step7Project is a Windows VS Code extension for STEP 7 Classic V5.5 SP3 / S7-300. An agent's primary interface is the exported project view's ordinary UTF-8 files and CLI. No model-specific integration is required.
 
-Если задача касается прошивки, работай в подключённом каталоге с `step7project.json`, а не в исходниках расширения. Прочитай его локальный `AGENTS.md`. Из дерева пользователь может дать обычный относительный путь к файлу; используй стандартные инструменты чтения и редактирования. В рабочем каталоге есть `step7project.cmd`, запускающий CLI с установленным расширением и подходящим Node/Electron runtime.
+For PLC program work, use the connected directory containing `step7project.json`, rather than this extension's source repository. Read that directory's local `AGENTS.md`. Paths copied from the tree are ordinary file paths; use standard file-reading/editing tools. The generated `step7project.cmd` invokes the installed CLI with a suitable Node/Electron runtime.
 
 ```powershell
 .\step7project.cmd status --workspace . --json
-# Измени выбранный файл в Programs/...
+# Edit the selected file under Programs/...
 .\step7project.cmd check --workspace . --json
 .\step7project.cmd apply --workspace . --json
 .\step7project.cmd status --workspace . --json
 ```
 
-Сохранение файла меняет рабочий текст. `check` компилирует копии S7-программ в отдельном TEMP-проекте; `apply` после такой проверки импортирует изменения в нативный проект и проверяет повторный экспорт. Выполняй `apply`, когда запись в нативный проект входит в задачу пользователя. Не называй локальную правку успешным применением или проверкой на ПЛК.
+Saving changes the editable text. `check` compiles copies of the affected S7 programs in a separate TEMP project. `apply` repeats staging, imports changes into the native project and verifies re-export. Run Apply when native-project writes are authorized by the user's task. Do not describe a local edit as a successful native import or PLC verification.
 
-`status` возвращает полные идентификаторы программ, пути, состояния и причины read-only. Разные CPU могут иметь одинаковые имена программ и номера блоков. SCL редактируется в Sources; его представление в Blocks не является исходным SCL. Таблица Symbols имеет один канонический формат CSV или ASC. Создание, переименование и удаление выполняются CLI, а затем применяются отдельной операцией. Примеры команд, резервирование и восстановление: [docs/AGENT-USAGE.md](docs/AGENT-USAGE.md).
+`status` exposes full program identifiers, paths, states and read-only reasons. Different CPUs can have identically named programs and block numbers. Edit SCL under Sources; its Blocks representation is not the original SCL. Symbols has one canonical CSV or ASC file. Create, rename and delete through the CLI, then apply separately. Commands, backup and recovery: [docs/AGENT-USAGE.md](docs/AGENT-USAGE.md).
 
-Не меняй нативные DBF/DBT/MDX напрямую. Не обходи защиту блоков, read-only, конфликты или recovery. Не трогай hardware, NetPro, соединения и загрузку в ПЛК. Не удаляй неизвестные символы или блоки. Удаление исходника не удаляет скомпилированные блоки.
+Never edit native DBF/DBT/MDX files directly. Preserve block protection, read-only access, conflicts and recovery barriers. Hardware, NetPro, connections and PLC downloads are outside scope. Do not delete unknown blocks or symbols. Deleting a source does not delete its compiled blocks.
 
-`project` в манифесте может быть относительным к его папке; полные пути доступны в `status.project` и `status.workspace`. Для переноса вместе с нативным проектом используй `configure --workspace . --project-path relative`. Индекс найденных представлений хранится только в пользовательском состоянии расширения. `rename` меняет имя объекта Sources, а не идентификаторы функций или номера DB. Символьные имена блоков задаются в Symbols; смена номера требует отдельной миграции ссылок.
+The manifest's `project` may be relative to its directory; `status.project` and `status.workspace` are resolved absolute paths. For portability with a native project, use `configure --workspace . --project-path relative`. Known-view indexes belong only to extension user state. `rename` changes a Sources object name; function identifiers and DB numbers stay unchanged. Symbolic block names belong in Symbols. Changing a block number requires a separate reference migration.
 
-## Если задача касается разработки расширения
+## Developing the extension
 
-Исходная база Toolbox — подмодуль `third-party/sources/Toolbox`, commit `f0b2c5a98fe3e1b71861cd47403aac02338efc99` из NuGet 4.4.10. Инициализируй через `git submodule update --init --recursive`; не обновляй автоматически на master. Лицензии и нюансы конкретных частей: [third-party/Toolbox.COMPONENTS.md](third-party/Toolbox.COMPONENTS.md). Оригинальный DBF-фрагмент имеет CPOL 1.02 по архивному первоисточнику. Не представляй всё дерево как MIT или как однородный LGPL. Backend пока использует NuGet; замена на собственную сборку, локальные patches и смена commit требуют явного описания и проверки. Не включай полный checkout upstream в VSIX: там есть внешние binaries и неиспользуемые upstream-приложения.
+Toolbox source is the `third-party/sources/Toolbox` submodule, pinned at `f0b2c5a98fe3e1b71861cd47403aac02338efc99` from NuGet 4.4.10 metadata. Initialize it with `git submodule update --init --recursive`; do not automatically update to master. See [per-component licenses and nuances](third-party/Toolbox.COMPONENTS.md). Archived primary sources identify the original DBF fragment as CPOL 1.02. Do not present the entire tree as MIT or as uniformly LGPL. The backend still uses NuGet. Switching to a source build, introducing patches or changing the pinned commit requires explicit documentation and verification. Exclude the full upstream checkout from VSIX; it contains external binaries and unrelated upstream applications.
 
-- `src/` — TypeScript: дерево, редактор symbols, рабочий каталог, резервирование, CLI.
-- `backend/` — .NET Framework 4.8 x86: чтение через DotNetSiemensPLCToolBoxLibrary и запись через STEP 7 Command Interface. `Invoke-Bridge.ps1` запускает native-компиляторы в интерактивном Windows-сеансе при Remote SSH.
-- `test/` — Node built-in tests; `tools/` — воспроизводимые проверки VM. `Examples/` и оставшийся `S-15/` — игнорируемые пользовательские примеры.
-- `language/interface_*.json` — исходники переводов, включая стандартный `en_us` и русский `ru_ru`. Корневые `package.nls*.json` генерируются командой `npm run languages:generate`; не редактируй их вручную. Неполные переводы используют английский fallback; сохраняй подстановки. Пользовательский импорт не требует пересборки: [language/README.md](language/README.md). VSIX выводится в `releases/`.
+- `src/`: TypeScript extension, Symbols editor, project views, backup and CLI.
+- `backend/`: .NET Framework 4.8 x86; DotNetSiemensPLCToolBoxLibrary for reading and STEP 7 Command Interface for writes. `Invoke-Bridge.ps1` runs native compilers in an interactive Windows session over Remote SSH.
+- `test/`: Node built-in tests. `tools/`: reproducible verification and VM scripts. `Examples/` and remaining `S-15/` are ignored user examples.
+- `language/interface_*.json`: translation sources, including en_us and ru_ru. Generate root `package.nls*.json` with `npm run languages:generate`; do not edit generated dictionaries. Partial translations fall back to English; preserve placeholders. Personal imports need no rebuild: [language/README.md](language/README.md).
+- `releases/`: local VSIX outputs. Versioned binaries belong in GitHub Releases, rather than Git history.
 
 ```powershell
 npm ci
@@ -38,12 +39,22 @@ npm test
 npm run package
 ```
 
-Не изменяй примеры при проверке записи. Используй новые каталоги `%TEMP%` на `vmware-siemens`, если пользователь разрешил эту машину. Не останавливай общие Siemens-процессы. Каждое новое разрешение записи формата подтверждай настоящим циклом импорт → компиляция → экспорт. Моки проверяют логику расширения, но не совместимость с STEP 7.
+Do not modify user examples to test writes. Use fresh `%TEMP%` directories on `vmware-siemens` only when the user authorizes that machine. Do not stop shared Siemens processes. Every newly writable native format must pass a real import → compile → export cycle. Mocks validate extension logic, not STEP 7 compatibility.
 
-Сохраняй точные native-идентификаторы, кодировки и границы CPU. Не делай успешным результат с частичной записью или потерянными данными. После ошибок обновляй журнал [docs/VERIFICATION.md](docs/VERIFICATION.md), а пользовательские изменения описывай в CHANGELOG.md.
+Preserve exact native identifiers, encodings and CPU boundaries. Never report success after partial writes or lost data. Record failures and completed checks in [docs/VERIFICATION.md](docs/VERIFICATION.md).
 
-Оригинальный код принадлежит Cody ([Svyatogor3757](https://github.com/Svyatogor3757)) и распространяется по MIT. Сохраняй copyright и полный LICENSE; чужие библиотеки не перелицензируются корневым MIT. Перед обновлением зависимостей или выпуском прочитай [docs/LICENSING.md](docs/LICENSING.md), проверь [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) и выполни `npm run licenses:audit` / `npm run licenses:check`. Открытые вопросы Toolbox в `third-party/release-review.json` блокируют упаковку. Не удаляй findings и не отключай проверку ради выпуска; для закрытия нужны документированные основания, а для LGPL — выполненные обязанности по поставке и проверке замены/пересборки библиотеки. `licenses:inventory` обновляет факты, но не одобряет условия. Не включай `node_modules`, signing tools, Siemens DLL и примеры в VSIX. Сохраняй оригинальные legal-файлы без переформатирования.
+User-facing documentation defaults to English. Keep [README.md](README.md) and [README.ru.md](README.ru.md) aligned, including their English/Russian navigation links. Document every user-facing change in both [CHANGELOG.md](CHANGELOG.md) and [CHANGELOG.ru.md](CHANGELOG.ru.md). [docs/AGENT-USAGE.md](docs/AGENT-USAGE.md) must be English; maintain its Russian companion when changing the workflow. Internal developer references and the single verification journal under `docs/` may remain Russian. Keep AGENTS.md as one English instruction set to avoid conflicting language copies.
 
-## Почему инструкция устроена так
+For interface localization, automatic mode follows the detected VS Code display language when a matching bundled or imported language is available; otherwise it falls back to English. Preserve explicit user choices. Cover unsupported locales and partial-translation fallback when changing this behavior.
 
-Корневой файл содержит короткий рабочий процесс и команды, подробности вынесены по ссылкам. Это соответствует назначению [AGENTS.md](https://agents.md/) и [официальной инструкции Codex](https://learn.chatgpt.com/docs/agent-configuration/agents-md). Сам AGENTS.md объясняет доступные инструменты; он не регистрирует новые инструменты модели. VS Code предоставляет отдельные [Language Model Tools](https://code.visualstudio.com/api/extension-guides/ai/tools), но текущая версия использует совместимые с терминальными агентами файлы и CLI.
+## Licensing and releases
+
+Original code is Copyright Cody ([Svyatogor3757](https://github.com/Svyatogor3757)), under MIT. Preserve the copyright and complete LICENSE. Third-party components retain their own licenses. Before dependency updates or releases, read [docs/LICENSING.md](docs/LICENSING.md), review [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md), and run `npm run licenses:audit` / `npm run licenses:check`.
+
+Open Toolbox findings in `third-party/release-review.json` block release packaging. Do not delete findings or disable the check to release a build. Resolution requires documented licensing grounds and, for LGPL distribution, completed source-delivery and replacement/relink requirements. `licenses:inventory` records facts without approving terms. Exclude node_modules, signing tools, Siemens DLLs and examples from VSIX. Preserve original legal-file bytes and formatting.
+
+Use [docs/RELEASING.md](docs/RELEASING.md) for tag/version mapping, CI and release drafts. Historical tags must identify their actual source commits. Never overwrite published tags or release assets. Do not publish a draft while its licensing review remains unresolved.
+
+## Why these instructions use files and CLI
+
+The root file keeps the workflow short and links to details, following the purpose of [AGENTS.md](https://agents.md/) and [Codex agent configuration](https://learn.chatgpt.com/docs/agent-configuration/agents-md). This file describes available tools; it does not register tools with an AI model. VS Code also supports [Language Model Tools](https://code.visualstudio.com/api/extension-guides/ai/tools), while this extension uses files and CLI for compatibility with terminal-based agents.

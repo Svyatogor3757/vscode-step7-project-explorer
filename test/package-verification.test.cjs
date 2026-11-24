@@ -1,0 +1,21 @@
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),{spawnSync}=require('node:child_process');
+// Private ZIP fixtures, not installable VSIX releases. No release gate is bypassed.
+function fixture(t){
+ const root=fs.mkdtempSync(path.join(os.tmpdir(),'SPB-package-check-')),extension=path.join(root,'content','extension');
+ t.after(()=>{assert.equal(path.dirname(root),os.tmpdir());fs.rmSync(root,{recursive:true,force:true});});fs.mkdirSync(extension,{recursive:true});
+ for(const directory of ['dist','bin','backend','third-party','language','docs'])fs.cpSync(directory,path.join(extension,directory),{recursive:true,filter:file=>!/(?:^|[\\/])(?:obj|Debug|sources|development)(?:[\\/]|$)|\.(?:cs|csproj|pdb|map)$|libnodave_|vscodeSmoke|vscodeUpgradeSeed/.test(file)});
+ for(const file of ['package.json','package.nls.json','package.nls.ru.json','README.md','README.ru.md','CHANGELOG.md','CHANGELOG.ru.md','LICENSE','AUTHORS.md','AGENTS.md','THIRD-PARTY-NOTICES.md'])fs.copyFileSync(file,path.join(extension,file));
+ return {root,extension};
+}
+function run(fixture){
+ const ps=path.join(process.env.SystemRoot,'System32','WindowsPowerShell','v1.0','powershell.exe'),zip=path.join(fixture.root,'fixture.zip'),compress=path.join(fixture.root,'compress.ps1');
+ fs.writeFileSync(compress,"param($Root,$Zip)\nAdd-Type -AssemblyName System.IO.Compression.FileSystem\n[IO.Compression.ZipFile]::CreateFromDirectory($Root,$Zip)\n");
+ const packed=spawnSync(ps,['-NoProfile','-File',compress,'-Root',path.join(fixture.root,'content'),'-Zip',zip],{encoding:'utf8',timeout:30000});assert.equal(packed.status,0,packed.stderr);
+ const checked=spawnSync(ps,['-NoProfile','-ExecutionPolicy','Bypass','-File',path.resolve('tools/verify-package.ps1'),'-Package',zip,'-SkipExample'],{encoding:'utf8',timeout:45000});
+ return {code:checked.status,output:checked.stdout+checked.stderr};
+}
+test('packaged_archive_accepts_matching_runtime_and_legal_inventory',{skip:process.platform!=='win32'},t=>{const result=run(fixture(t));assert.equal(result.code,0,result.output);assert.match(result.output,/PASS packaged_manifest_and_license_inventory/);assert.match(result.output,/PASS packaged_backend_doctor/);assert.match(result.output,/SKIP user_example_offline_export/);});
+test('packaged_archive_rejects_missing_legal_file',{skip:process.platform!=='win32'},t=>{const data=fixture(t);fs.unlinkSync(path.join(data.extension,'AUTHORS.md'));const result=run(data);assert.notEqual(result.code,0);assert.match(result.output,/Missing packaged legal\/documentation file: AUTHORS.md/);});
+test('packaged_archive_rejects_modified_dependency',{skip:process.platform!=='win32'},t=>{const data=fixture(t);fs.appendFileSync(path.join(data.extension,'backend/bin/System.Memory.dll'),'changed');const result=run(data);assert.notEqual(result.code,0);assert.match(result.output,/Inventoried file hash differs: backend\/bin\/System.Memory.dll/);});
+test('packaged_archive_rejects_uninventoried_dll',{skip:process.platform!=='win32'},t=>{const data=fixture(t);fs.writeFileSync(path.join(data.extension,'backend/bin/Siemens.Unexpected.dll'),'fixture');const result=run(data);assert.notEqual(result.code,0);assert.match(result.output,/Uninventoried packaged DLL: backend\/bin\/Siemens.Unexpected.dll/);});
+test('packaged_archive_rejects_mismatched_version',{skip:process.platform!=='win32'},t=>{const data=fixture(t),file=path.join(data.extension,'package.json'),manifest=JSON.parse(fs.readFileSync(file,'utf8'));manifest.version='99.0.0';fs.writeFileSync(file,JSON.stringify(manifest));const result=run(data);assert.notEqual(result.code,0);assert.match(result.output,/Packaged identity differs/);});

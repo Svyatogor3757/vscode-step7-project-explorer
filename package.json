@@ -9,6 +9,14 @@
     "url": "https://github.com/Svyatogor3757"
   },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Svyatogor3757/vscode-step7-project-explorer.git"
+  },
+  "homepage": "https://github.com/Svyatogor3757/vscode-step7-project-explorer#readme",
+  "bugs": {
+    "url": "https://github.com/Svyatogor3757/vscode-step7-project-explorer/issues"
+  },
   "engines": {
     "vscode": "^1.95.0",
     "node": ">=20"

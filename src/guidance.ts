@@ -2,13 +2,13 @@ import path from 'node:path';
 import fs from 'node:fs';
 import {atomic,inside} from './storage';
 export function agentGuide():string {
- return `# Работа с STEP 7 через Step7Project
+ return `# Working with STEP 7 through Step7Project
 
-Этот каталог — редактируемое представление нативного проекта STEP 7 Classic. Файлы в Programs доступны обычным инструментам чтения, поиска и редактирования. Сохранение текста не применяет изменения к STEP 7.
+This directory is an editable view of a native STEP 7 Classic project. Files under Programs are available to ordinary reading, search and editing tools. Saving text does not apply changes to STEP 7.
 
-## Команды
+## Commands
 
-Запускай из этого каталога на Windows-хосте проекта, в том числе в терминале VS Code Remote SSH:
+Run from this directory on the Windows project host, including a VS Code Remote SSH terminal:
 
 \`\`\`powershell
 .\\step7project.cmd doctor --json
@@ -17,20 +17,20 @@ export function agentGuide():string {
 .\\step7project.cmd apply --workspace . --json
 \`\`\`
 
-CLI всегда возвращает JSON. Код 0 означает успех; ненулевой код означает ошибку. check создаёт отдельный тестовый проект через STEP 7 и компилирует копии программ. apply повторяет проверку, затем изменяет нативный проект. Для записи нужен STEP 7 и проект, один раз открытый в SIMATIC Manager. При Remote SSH войди в Windows под той же учётной записью: компиляторы STEP 7 используют интерактивный сеанс.
+The CLI returns JSON. Exit code 0 means success; a nonzero code means failure. Check creates a separate STEP 7 test project and compiles program copies. Apply repeats checks, then writes the native project. Native writes require STEP 7 and a project previously opened in SIMATIC Manager. With Remote SSH, sign in to Windows as the same account: STEP 7 compilers use the interactive desktop session.
 
-Поле project в step7project.json может быть относительным: оно разрешается от папки манифеста. status.project и status.workspace возвращают полные пути. Для переносимости обеих папок вместе используй configure --workspace . --project-path relative; absolute сохраняет абсолютную привязку. Не подставляй текущий каталог терминала при разрешении project. После передачи представления открой его папку или JSON в расширении: служебный launcher обновится для текущего хоста, пользовательский скрипт сохранится.
+The project field in step7project.json may be relative to the manifest directory. status.project and status.workspace are absolute. To move both directories together, use configure --workspace . --project-path relative; absolute stores an absolute reference. Do not resolve project against the terminal directory. Open a transferred view or its JSON in the extension to rebind the generated CLI launcher; custom scripts are preserved.
 
-## Порядок работы
+## Workflow
 
-1. Выполни status. Определи нужную программу по полному идентификатору: разные CPU могут иметь одинаковые имена файлов и номера блоков.
-2. Читай и редактируй обычный файл, путь к которому пользователь скопировал из вкладки Step7Project. SCL редактируй в Sources; Blocks содержит отдельное представление скомпилированных блоков.
-3. Сохраняй UTF-8. Для symbols сохраняй заголовок CSV symbol,address,type,comment, кавычки и все строки, которых задача не касается. У VAT тип данных может быть пустым. ASC — фиксированные поля, не произвольный CSV.
-4. Выполни status и check. Исправь ошибки компилятора и конфликты. Не редактируй скомпилированное представление SCL вместо исходника.
-5. Если задача включает запись в нативный проект, выполни apply. Иначе оставь локальные изменения и сообщи, что они ещё не применены.
-6. Повтори status и прочитай результат. В отчёте различай изменение текста, успешную компиляцию на копии и успешное применение к нативному проекту. Проверка на ПЛК сюда не входит.
+1. Run status. Identify the program by its full ID: different CPUs can share filenames and block numbers.
+2. Read and edit the ordinary file whose path the user copied from Step7Project. Edit SCL in Sources; Blocks is a separate representation of compiled blocks.
+3. Save UTF-8. Preserve the symbols CSV header symbol,address,type,comment, quoting and unaffected rows. VAT can have an empty type. ASC has fixed-width fields.
+4. Run status and check. Resolve compiler errors and conflicts. Edit original SCL sources rather than their compiled representation.
+5. Run apply when the task authorizes native-project writes. Otherwise retain local edits and report them as unapplied.
+6. Repeat status and inspect the result. Distinguish text edits, successful compilation of a copy and verified native Apply. No PLC verification is implied.
 
-## Структурные изменения
+## Structural changes
 
 \`\`\`powershell
 .\\step7project.cmd create --workspace . --program "Station\\CPU\\Program" --type FC --number 901 --language scl
@@ -39,19 +39,19 @@ CLI всегда возвращает JSON. Код 0 означает успех
 .\\step7project.cmd delete --workspace . --file "Programs/.../Blocks/FC/FC901.Name.awl"
 \`\`\`
 
-Точный --program возьми из status.programs, --file из status.changes. Создание создаёт исходник, компиляция создаёт блоки. Удаление исходника не удаляет его скомпилированные блоки. Для удаления блока используй его отдельный путь. Исчезновение файла с диска не считается разрешением удалить объект в STEP 7. Применяй изменения исходников и прямые правки блоков одной программы отдельными пакетами.
+Use exact --program values from status.programs and --file paths from status.changes. Create adds source text; compilation creates blocks. Deleting a source leaves its compiled blocks; delete blocks separately. A missing local file is not permission to delete its native object. Apply Sources changes and direct Blocks changes in the same program as separate batches.
 
-rename меняет имя объекта Sources (1–24 символа), а не имена функций внутри текста. Не переименовывай DB/FB/FC обычным перемещением файла: символьные имена задаются в Symbols, а смена номера требует отдельной миграции всех ссылок. Старое имя Symbols.symbols.csv допустимо. Чтобы перейти на Symbols.csv без локальных правок таблицы, закрой её редакторы и выполни symbols-format --workspace . --format csv; незнакомый целевой файл не перезаписывается.
+Rename changes a Sources object name (1–24 characters), not function identifiers inside it. Do not rename DB/FB/FC objects by moving files. Symbolic names belong in Symbols; block-number changes require a separate reference migration. Legacy Symbols.symbols.csv is supported. To migrate a clean table to Symbols.csv, close its editors and run symbols-format --workspace . --format csv; an existing destination is not overwritten.
 
-## Ограничения и восстановление
+## Limits and recovery
 
-- Не меняй нативные DBF/DBT/MDX, hardware, сети или подключение ПЛК.
-- AWL использует мнемонику из status.awlMnemonics; она должна совпадать с Options > Customize > Language в STEP 7. Для смены без локальных правок: configure --workspace . --mnemonics english (или german), затем refresh --workspace .; Sources автоматически не переводится.
-- Не обходи readOnly и know-how protection; используй доступный исходник. SFC/SFB и неподдерживаемые форматы доступны для чтения.
-- Не редактируй step7project.json вручную ради снятия конфликтов. Не удаляй чужую блокировку записи.
-- При recovery останови новые применения. Прочитай сообщение и снимок проекта, проверь фактическое состояние. restore восстанавливает только в новый путь. После осознанной проверки используй recover --acknowledge-native-state, затем status/refresh и снова check.
-- Резервирование по умолчанию everySave. Внешние записи отслеживаются, пока расширение активно; при закрытом VS Code история каждого внешнего сохранения недоступна. Снимки проекта делаются перед apply во всех включённых режимах. off отключает постоянные копии.
-- Не удаляй и не перезаписывай существующий AGENTS.md. При переносе рабочего каталога на другую машину исправь привязку CLI повторным подключением инструмента.
+- Do not edit native DBF/DBT/MDX files, hardware, networks or PLC connections.
+- AWL uses status.awlMnemonics, matching STEP 7 Options > Customize > Language. With no pending edits, use configure --workspace . --mnemonics english or german, then refresh --workspace .; existing Sources text is not translated.
+- Preserve readOnly and know-how protection. Use an available original source. SFC/SFB and unsupported formats are read-only.
+- Do not edit step7project.json to bypass conflicts or remove another process's write lock.
+- On recovery, stop new applies. Read diagnostics, inspect the snapshot and actual project state. Restore only into a new location. After deliberate operator review, use recover --acknowledge-native-state, then status/refresh and check again.
+- Backup defaults to everySave. External writes are observed while the extension is active; closed VS Code cannot retain every external save. Enabled modes snapshot the native project before Apply. Off disables persistent automatic backups.
+- Preserve an existing AGENTS.md. Reconnect transferred views to rebind the CLI to the current host without overwriting custom launchers.
 `;
 }
 export function launcher():string {

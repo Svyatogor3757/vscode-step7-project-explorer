@@ -10,3 +10,5 @@ backend/bin/
 *.binlog
 .scratch/
 debug.log
+.vscode
+[Rr]eleases/

@@ -1,15 +1,12 @@
-# Переводы интерфейса
+# Interface translations
 
-Редактируемые переводы находятся здесь:
+**English** | [Русский](README.ru.md)
 
-- `interface_en_us.json` — стандартный английский.
-- `interface_ru_ru.json` — русский.
+Editable bundled translations live here: `interface_en_us.json` is standard English; `interface_ru_ru.json` is Russian. Filenames use lowercase language/region codes. `name` is the display name and `vscodeLocale` identifies the editor locale. `messages` translates the tree, dialogs and Symbols editor; `manifest` translates native VS Code contributions.
 
-Коды в именах файлов пишутся строчными буквами. `name` задаёт отображаемое название, `vscodeLocale` — соответствующий язык среды. `messages` содержит строки дерева, диалогов и редактора Symbols; `manifest` — строки зарегистрированных VS Code команд и настроек.
+## Personal translations without rebuilding
 
-## Личный перевод без сборки
-
-Создайте, например, `interface_de_de.json`:
+Create a file such as `interface_de_de.json`:
 
 ```json
 {
@@ -22,25 +19,25 @@
 }
 ```
 
-В VS Code выполните **Выбрать язык интерфейса / Choose Interface Language → Импортировать файл перевода / Import translation file**. Расширение проверит файл, сохранит его копию в пользовательском хранилище на хосте расширения и выберет её. Перевод появится в списке этой команды при следующих открытиях. Скачивать исходники, собирать VSIX или отправлять pull request для личного перевода не нужно. При замене существующего перевода с другим содержимым запрашивается подтверждение. Отмена оставляет прежний файл.
+Run **Choose Interface Language → Import translation file**. The extension validates it, saves an original-byte copy in its user storage on the extension host, and selects it. Saved translations appear in that command's language list. No source checkout, VSIX build or pull request is required. Replacing different contents asks for confirmation; cancellation preserves the existing file.
 
-Можно переводить постепенно: отсутствующие строки и отсутствующая секция берутся из стандартного английского перевода. Подстановки `{0}`, `{1}` должны сохраняться; некорректный JSON, пустые значения и повреждённые подстановки отклоняются. Если настроенный пользовательский файл перестал читаться, расширение использует английский и записывает причину в Output → Step7Project.
+Translations can be partial: missing keys and missing sections use standard English. Preserve placeholders such as `{0}` and `{1}`. Invalid JSON, empty values and damaged placeholders are rejected. An unreadable configured file falls back to English and records the reason in Output → Step7Project.
 
-Настройки: `step7project.interface.language` — автоматически / встроенный язык / пользовательский файл; `step7project.interface.customFile` — путь к пользовательской копии. Путь является настройкой машины и не записывается в PLC-проект. При работе через Remote SSH пользовательское хранилище находится на хосте расширения. Для повторного редактирования можно изменить файл по этому пути и снова выбрать язык командой либо импортировать обновлённый оригинал. Хранилище не находится внутри каталога установленной версии расширения.
+`step7project.interface.language` defaults to automatic selection: a matching bundled or imported language follows VS Code's Display Language; an unsupported locale uses English. Explicit choices are preserved. `step7project.interface.customFile` points to a personal translation copy; it is a machine setting outside the PLC project. With Remote SSH, storage is on the extension host. Edit that file and select the language again, or import an updated original. User storage survives extension-installation directory changes.
 
-Дерево и следующие диалоги меняют язык сразу. Уже открытую таблицу Symbols откройте заново. Названия команд в палитре, контейнер панели и нативные настройки VS Code следуют **Display Language самой среды**: пользовательский файл не меняет язык оболочки VS Code. В стандартном выпадающем списке настроек динамический перевод представлен пунктом «Пользовательский перевод из файла»; полный список импортированных файлов показывает команда выбора языка.
+The tree and subsequent dialogs change language immediately. Reopen an existing Symbols editor. Native command-palette labels, the activity container and settings follow **VS Code's own Display Language**; a personal translation does not change the editor shell. Native settings expose a “Custom translation from file” choice; the command lists individual imported files.
 
-## Встроенный перевод для общего выпуска
+## Bundled translations for a release
 
-Добавьте `interface_<код>.json` в эту папку и выполните:
+Add `interface_<code>.json` and run:
 
 ```powershell
 npm run languages:generate
 npm test
 ```
 
-Генератор сам найдёт файлы, добавит встроенные языки в настройку и создаст совместимые с VS Code `package.nls.json`, `package.nls.<vscodeLocale>.json`. Неполные встроенные переводы также дополняются английскими строками. При удалении языка удаляются только ранее сгенерированные для него nls-файлы. `generated.json` — служебный список этих файлов. Генератор проверяет коды, совпадение подстановок и уникальность `vscodeLocale`; при ошибках сборка останавливается.
+The generator discovers translation files, adds bundled languages to the settings schema, and writes VS Code's `package.nls.json` and `package.nls.<vscodeLocale>.json`. Partial manifest translations fall back to English. Removing a language removes only its previously generated nls files, tracked in `generated.json`. Invalid codes, duplicate vscodeLocale values and mismatched placeholders stop generation.
 
-Не редактируйте корневые `package.nls*.json` вручную: следующая генерация перезапишет их. Для включения перевода в общий выпуск можно отправить pull request с исходным `interface_*.json` и результатами генерации. После установки новой сборки перезагрузите окно, чтобы VS Code перечитал манифест.
+Edit `interface_*.json`, rather than generated root `package.nls*.json`. To include a language in the shared release, submit the source translation and generated files in a pull request. Reload Window after installing an updated build so VS Code reloads its manifest.
 
-`catalog.cjs` — собственный загрузчик и валидатор, общий для runtime и генератора. Дополнительных npm-зависимостей для переводов нет.
+`catalog.cjs` is the project's own loader/validator shared by runtime and generation. No additional npm runtime dependency is required.

@@ -1,97 +1,101 @@
 # Step7Project
 
-Браузер и редактор **STEP 7 Classic V5.5 SP3 / S7-300** для VS Code на Windows. Вкладка **Step7Project** показывает программы разных CPU, исходники SCL/AWL, блоки и таблицы символов. Файлы доступны пользователю и ИИ-агентам как обычные UTF-8-файлы.
+**English** | [Русский](README.ru.md)
 
-Автор — **Cody** ([Svyatogor3757](https://github.com/Svyatogor3757)). Оригинальный код распространяется по [MIT](LICENSE): разрешены изменение и коммерческое использование с сохранением copyright и текста лицензии. У зависимостей свои условия: [уведомления](THIRD-PARTY-NOTICES.md), [инструкция по лицензиям](docs/LICENSING.md).
+A **STEP 7 Classic V5.5 SP3 / S7-300** project browser and editor for VS Code on Windows. The Step7Project sidebar displays programs from different CPUs, SCL/AWL sources, blocks and symbol tables. Users and AI agents work with ordinary UTF-8 files.
 
-**Перед распространением сборки:** аудит от 24.11.2026 выявил противоречия в лицензиях Toolbox 4.4.10 и отдельные CPOL 1.02 условия заимствованного DBF-кода. Новая упаковка блокируется до закрытия [трёх пунктов review](third-party/release-review.json); локальная сборка и тестирование доступны. Ранее собранный VSIX 0.1.3 этим аудитом не признан готовым к распространению.
+Created by **Cody** ([Svyatogor3757](https://github.com/Svyatogor3757)). Original project code is available under [MIT](LICENSE), allowing modification and commercial use while retaining the copyright and license text. Dependencies retain their own terms: [third-party notices](THIRD-PARTY-NOTICES.md), [licensing review](docs/LICENSING.md).
 
-## Установка и начало работы
+**Distribution status:** the 2026-11-24 audit identified conflicting MIT/LGPL notices in Toolbox 4.4.10 and separate CPOL 1.02 terms for its incorporated DBF code. Release packaging is blocked until the [three review items](third-party/release-review.json) are resolved. Local compilation and tests remain available. Historical VSIX files are not cleared for redistribution by this audit. GitHub release drafts preserve those historical builds for maintainer review.
 
-1. Собранные пакеты находятся в `releases/`, например `releases/step7project-0.1.3.vsix`: **Extensions → … → Install from VSIX**. После обновления поверх предыдущей версии выполните **Ctrl+Shift+P → Developer: Reload Window** («Разработчик: Перезагрузить окно»), чтобы окно перечитало регистрацию групп и команд. Изменения ниже пока находятся в исходниках; новый выпуск остаётся заблокирован лицензионными вопросами Toolbox.
-2. В группе **Управление проектом → Открыть проект** выберите `.s7p` и родительский каталог нового представления `<имя>-code`. Если представление уже есть, можно выбрать его `step7project.json`; известное представление будет подключено без повторного экспорта.
-3. Откройте исходник во вкладке Step7Project, измените и сохраните. Для ИИ скопируйте путь через контекстное меню.
-4. Выполните **Проверить изменения**, затем **Применить изменения**. Сохранение текста само по себе не меняет нативный проект.
+## Installation and first steps
 
-## Интерфейс, активный проект и перенос
+1. Build outputs belong in `releases/`, for example `releases/step7project-0.1.3.vsix`. Install with **Extensions → … → Install from VSIX**. After updating an existing installation, run **Developer: Reload Window** from the command palette so VS Code reloads the registered views and commands. Changes listed under Unreleased are currently in source; a new binary release remains blocked by the Toolbox review.
+2. In **Project Controls → Open Project**, select a native `.s7p` and the parent directory for a new `<name>-code` project view. For an existing view, select its `step7project.json`; known views reconnect without another export.
+3. Open a source in the Step7Project sidebar, edit and save. Use the context menu to copy a file path for an AI agent.
+4. Run **Check Changes**, then **Apply Changes**. Saving text updates the project view; Apply is the separate operation that writes the native STEP 7 project.
 
-Проводник разделён на две стандартные группы VS Code, как «Структура» и «Временная шкала»: **Управление проектом** и **Проект**. Управление содержит пять действий — открыть, обновить, применить, проверить, создать блок. Строки не зависят от переполнения панели заголовка; группы можно сворачивать и менять их высоту.
+## Explorer, active projects and portability
 
-Если управление скрыто, выполните **Показать управление проектом** из палитры команд или значком в заголовке дерева. Команда раскрывает эту группу, сохраняя расположение других панелей. «Обновить» перечитывает проект STEP 7 и не заменяет перезагрузку окна после установки обновления. О поведении обновлений см. [документацию VS Code](https://code.visualstudio.com/docs/configure/extensions/extension-marketplace#_update-an-extension).
+The sidebar uses two standard VS Code views, **Project Controls** and **Project**, like Outline and Timeline. Project Controls exposes five actions as individual rows: open, refresh, apply, check and create a block. Views can be collapsed and resized; actions remain accessible in a narrow sidebar.
 
-Встроены English и Russian, по умолчанию язык следует Display Language в VS Code. `step7project.interface.language` позволяет отдельно выбрать язык дерева и диалогов. Команда **Выбрать язык интерфейса** также импортирует личные `interface_*.json` без сборки и показывает сохранённые пользовательские переводы. Неполные переводы дополняются стандартными английскими строками. Нативные команды и настройки VS Code следуют языку самой среды; открытую таблицу Symbols после смены языка откройте заново. Диагностика CLI, backend и компиляторов может оставаться на исходном языке. Мнемоника AWL не меняется. Формат и пример файла: [language/README.md](language/README.md).
+If controls are hidden, use **Show Project Controls** from the command palette or the project tree toolbar. It reveals the view without resetting other panels. Refresh rereads the STEP 7 project; after installing an extension update, use Reload Window. See [VS Code extension updates](https://code.visualstudio.com/docs/configure/extensions/extension-marketplace#_update-an-extension).
 
-Выпадающие списки настроек показывают переведённые подписи — «Каждое сохранение», «Таблица», «Относительный, если возможно» и т. п. В JSON настроек остаются прежние значения `everySave`, `table`, `relative`; существующая конфигурация совместима.
+English and Russian are bundled. The default interface language follows VS Code's Display Language. `step7project.interface.language` can override the language of the tree and dialogs. **Choose Interface Language** can import personal `interface_*.json` translations without rebuilding and lists previously imported files. Missing translations fall back to standard English. Native VS Code commands, container names and settings follow the editor's Display Language; reopen an existing Symbols editor after changing the extension language. CLI, backend and compiler diagnostics may remain in their original language. The interface language does not change AWL mnemonics. See the [translation format and example](language/README.md).
 
-При открытии рабочей области расширение ищет `step7project.json` в её корнях и вложенных папках. Резервные копии и служебные каталоги `.git`, `.step7project`, `.scratch`, `node_modules` исключены. Можно держать несколько представлений. Активное выбирается командой **Выбрать активный проект**, переключением редактора на его файл или открытием файла из дерева. Действия управления работают с активным проектом; его выбор сохраняется для рабочей области.
+Settings dropdowns show translated labels such as “Every save”, “Table” and “Relative when possible”. Stored JSON values remain `everySave`, `table` and `relative`, preserving existing configuration.
 
-В управлении показаны нативный проект и каталог представления. Подсказки содержат полные пути. Щелчок переключает на «Файлы» в VS Code: существующая содержащая папка переиспользуется, а при нескольких подходящих корнях выбирается наиболее конкретный. Если подходящей папки нет, каталог нативного проекта или представления добавляется в текущий workspace; остальные корни сохраняются. Отсутствующий на диске путь вызывает ошибку без открытия посторонней папки. Правой кнопкой доступны копирование полного/относительного пути и отдельный переход в проводник Windows, для представления — также проводник VS Code.
+Automatic selection considers both bundled and saved personal translations. If the detected editor locale has no matching language, English is used. An explicit user selection takes precedence over automatic detection.
 
-Удаление папки из workspace закрывает проект в Step7Project, если больше ни один корень не содержит его представление. Это не удаляет файлы. Для повторного подключения выберите `step7project.json` через «Открыть проект». Закрытые проекты не удерживаются автоматически. Временное сохранение перехода при перезапуске Extension Host относится только к уже запрошенному добавлению папки; отменённое добавление или последующее закрытие не восстанавливаются автоматически.
+When a workspace opens, the extension searches its roots and nested directories for `step7project.json`. Backup and internal directories such as `.git`, `.step7project`, `.scratch` and `node_modules` are excluded. Multiple project views are supported. **Select Active Project**, opening one of its files, or selecting a file in the tree changes the active project. Control actions target that project; its selection is remembered for the workspace.
 
-Поле `project` в манифесте указывает на нативный `.s7p`; относительное значение вычисляется **от папки манифеста**, а не от текущего терминала. В новых представлениях настройка `step7project.projectPath.mode` по умолчанию `relative`; между разными дисками сохраняется абсолютный путь. Поэтому нативный проект и представление можно переносить вместе с сохранением взаимного расположения. Путь самого представления внутри JSON не дублируется.
+Project Controls shows the native project and its project view, with full paths in tooltips. Clicking either opens VS Code's Files Explorer. An existing containing workspace folder is reused, choosing the most specific root when several match. Otherwise, the appropriate native-project or project-view directory is added to the current workspace while preserving other roots. A missing path reports an error. Context actions copy absolute or relative paths and open Windows Explorer; the project view also has an explicit VS Code Explorer action.
 
-Старые абсолютные привязки не переписываются автоматически. Для существующего представления: `step7project.cmd configure --workspace . --project-path relative` или `absolute`. Это не меняет нативный проект и локальный код. Новые представления и переход на относительную привязку используют schema 2: версия 0.1.0 отклонит такой манифест, вместо неправильного разрешения пути. Старые schema 1 поддерживаются.
+Removing a workspace folder closes a project connection when no remaining root contains its view. Files are retained. To reconnect, select `step7project.json` through Open Project. Closed projects are not reopened automatically. Temporary navigation state only completes a folder addition already requested before an Extension Host restart; cancelled additions and subsequently removed folders stay closed.
 
-Индекс связей «нативный проект → представления» хранится только в пользовательском состоянии расширения на хосте, не в Siemens-проекте и не в Git. Перед повторным подключением проверяется актуальный манифест. После передачи другому пользователю достаточно открыть папку с представлением или его JSON; служебный launcher будет привязан к текущей установке расширения. Пользовательские версии launcher и AGENTS.md сохраняются.
+The manifest's `project` field points to the native `.s7p`. Relative values resolve **from the manifest directory**, independently of the terminal's current directory. New views default to `step7project.projectPath.mode: relative`; different drives require an absolute path. Native projects and their views can therefore move together while preserving their relative layout. The view's own path is not duplicated in the manifest.
 
-Чтение проекта не требует STEP 7. Для импорта и компиляции нужен установленный STEP 7 с нужными языковыми пакетами и лицензиями, .NET Framework 4.8 и проект, однажды открытый в SIMATIC Manager. Code должен работать с правами пользователя, которому доступен проект. Hardware, NetPro и загрузка в ПЛК выполняются средствами Siemens.
+Existing absolute references are preserved. To change an existing view, use `step7project.cmd configure --workspace . --project-path relative` or `absolute`. This preserves the native project and local edits. New views and relative-path migration use schema 2; extension 0.1.0 rejects this schema instead of resolving paths incorrectly. Legacy schema 1 is supported.
+
+The native-project-to-view index lives only in the extension's user state on its host, outside Siemens projects and Git. The manifest is checked before reconnecting. After transfer, open the view directory or its JSON manifest; its generated launcher is rebound to the current extension installation. Custom launchers and existing AGENTS.md files are preserved.
+
+Offline project reading does not require STEP 7. Import and compilation require a licensed STEP 7 installation with the relevant language packages, .NET Framework 4.8, and a project previously opened in SIMATIC Manager. VS Code must run as a user who can access the project. Hardware configuration, NetPro and PLC downloads remain Siemens operations.
 
 ## Remote SSH
 
-Подключитесь VS Code Remote SSH к Windows-машине с STEP 7 и установите расширение **на удалённый хост**. Проект и рабочие файлы остаются там. Для записи войдите в Windows под той же учётной записью: native-компиляторы STEP 7 используют desktop-сеанс. Расширение запускает bridge в нём через временную задачу Планировщика заданий; пароль в настройках не хранится. Чтение и текстовое редактирование доступны без desktop-сеанса.
+Connect VS Code Remote SSH to the Windows machine with STEP 7 and install this extension **on the remote host**. Projects and editable files remain there. For native writes, sign in to Windows as the same account: STEP 7 compilers require an interactive desktop session. The bridge uses a temporary scheduled task to run in that session; no password is stored in extension settings. Offline reading and text editing work without a desktop session.
 
-Расширение объявлено как `extensionKind: workspace`, поэтому backend запускается на том же хосте, что рабочий каталог, согласно [модели Remote Extensions](https://code.visualstudio.com/api/advanced-topics/remote-extensions).
+The extension declares `extensionKind: workspace`, so the backend runs on the same host as the project view. See the [Remote Extensions model](https://code.visualstudio.com/api/advanced-topics/remote-extensions).
 
-## Что редактируется
+## Editing support
 
-| Объект | Представление и запись |
+| Object | Representation and write support |
 | --- | --- |
-| SCL, AWL/STL в Sources | Исходный текст; импорт и компиляция через STEP 7 |
-| OB, FC, FB на AWL | Полный экспорт в AWL и обратная компиляция, если блок не защищён |
-| DB, UDT | AWL-представление структуры и значений, обратная компиляция |
-| Блок, скомпилированный из SCL | Доступное представление только для чтения; меняйте оригинал в Sources |
-| LAD/FBD/GRAPH и неизвестные форматы | Только чтение; преобразование графического оригинала в AWL автоматически не выполняется |
-| Защищённые блоки, SFC/SFB | Только чтение; доступные метаданные/интерфейс, без обхода защиты |
-| Symbols | CSV или ASC; встроенная таблица, текст либо сторонний CSV-редактор |
-| VAT | Отображаются как неподдерживаемые для изменения блоки; ссылки VAT в symbols сохраняются |
+| SCL and AWL/STL Sources | Original source text; import and compilation through STEP 7 |
+| AWL OB, FC and FB | Full AWL export and recompilation when unprotected |
+| DB and UDT | AWL representation of structure and values, followed by recompilation |
+| Blocks compiled from SCL | Available representation is read-only; edit the original Sources object |
+| LAD/FBD/GRAPH and unknown formats | Read-only; graphical originals are not automatically converted to AWL |
+| Protected blocks and SFC/SFB | Read-only metadata/interface where available; protection is preserved |
+| Symbols | CSV or ASC, using the built-in table, a text editor or a third-party CSV editor |
+| VAT | Shown as blocks unsupported for editing; VAT references in Symbols are preserved |
 
-Команда **Create Source or Block** создаёт шаблоны OB/FC/FB/DB/UDT на SCL или AWL, включая экземплярные DB. До применения это новые локальные исходники; после компиляции появляются блоки. Номер блока и зависимости окончательно проверяет STEP 7.
+**Create Block** creates OB/FC/FB/DB/UDT source templates in SCL or AWL, including instance DBs. They remain local source files until Apply compiles them into native blocks. STEP 7 performs final checks of block numbers and dependencies.
 
-Исходник может создавать несколько блоков. Удаление исходника оставляет уже скомпилированные блоки; для их удаления используйте отдельные объекты Blocks. Пропажа файла с диска не удаляет объект автоматически. **Переименовать исходник** задаёт имя объекта Sources, а не функции внутри текста: проверяются 1–24 символа, запрещённые имена Windows и дубликаты в той же программе. До Apply это запланированное изменение. Apply переимпортирует и компилирует исходник через STEP 7 с проверкой stage и повторного экспорта, поэтому нативные таблицы обновляет Siemens.
+A source can produce multiple blocks. Deleting a source leaves its compiled blocks; delete those explicitly under Blocks if required. A missing local file does not automatically delete a native object. **Rename Source** changes the Sources object name, with a 1–24 character limit, Windows-name validation and duplicate checks within its program. It does not rename functions inside the source. The rename remains pending until Apply reimports and compiles it through STEP 7, with staging and re-export verification; Siemens updates the native tables.
 
-Имена функций и ссылки внутри исходника автоматически не переименовываются. Нельзя переименовать DB117.awl в другой номер обычной файловой операцией: номер DB и символьное имя — разные вещи. Символьное имя задаётся строкой Symbols с адресом DB117; изменение номера требует создания нового блока, обновления всех ссылок, проверки и отдельного удаления старого. Автоматический глобальный рефакторинг таких связей не реализован.
+Function identifiers and references inside source text are not renamed automatically. Renaming `DB117.awl` as a file does not migrate a block number. A symbolic block name is a Symbols entry with an address such as `DB117`; changing the number requires creating a new block, migrating references, checking consistency and explicitly removing the old block. Global reference migration is not implemented.
 
-`step7project.awl.mnemonics` выбирает английскую (`A`, `JU`) или немецкую (`U`, `SPA`) мнемонику для нового рабочего каталога. Она должна соответствовать **Options → Customize → Language** в STEP 7. Настройка сохраняется в манифесте; для существующего каталога без локальных правок выполните CLI `configure --workspace . --mnemonics english` (или `german`), затем `refresh --workspace .`. Исходные тексты автоматически не переводятся. Для CSL отдельный компилятор не реализован: поддержаны штатные SCL и AWL/STL.
+`step7project.awl.mnemonics` selects English (`A`, `JU`) or German (`U`, `SPA`) mnemonics for new project views. Match **STEP 7 → Options → Customize → Language**. The dialect is stored in the manifest. For an existing clean view, run `configure --workspace . --mnemonics english` or `german`, then `refresh --workspace .`. Existing text is not translated automatically. A separate CSL compiler is not implemented; supported source languages are SCL and AWL/STL.
 
-Незащищённые пользовательские блоки, включая скомпилированные из SCL, можно явно удалять; возможность удаления не означает доступности редактирования текста. Изменение интерфейса FB/UDT может потребовать обновления зависимых блоков и экземплярных DB. Автоматическое пересоздание всех зависимостей не выполняется; проверяйте согласованность средствами STEP 7.
+Unprotected user blocks, including those compiled from SCL, can be explicitly deleted. Deletion support does not imply text-editing support. Changing an FB/UDT interface may require updating dependent blocks and instance DBs. Dependencies are not all regenerated automatically; verify consistency in STEP 7.
 
-## Symbols и резервирование
+## Symbols and backups
 
-`step7project.symbols.editor`: `table` — встроенная таблица, `text` — текстовый редактор, `default` — редактор по умолчанию, включая сторонний CSV-плагин. Команда **Open as Text** доступна и в контекстном меню.
+`step7project.symbols.editor` selects `table` for the built-in table, `text` for the text editor, or `default` for the default editor, including third-party CSV extensions. **Open as Text** is also available in the context menu.
 
-`step7project.symbols.format` задаёт CSV/ASC для новых рабочих каталогов. Новые файлы называются `Symbols.csv` или `Symbols.asc` внутри папки Symbols. Для существующего используйте **Выбрать формат Symbols** без неприменённых правок таблицы. Старые `Symbols.symbols.csv` поддерживаются: закройте редакторы Symbols и повторно выберите текущий формат, чтобы сократить имя. При конфликте с существующим целевым файлом операция отклоняется. Канонический файл один: независимые CSV и ASC одновременно не редактируются.
+`step7project.symbols.format` selects CSV or ASC for new views. New files are named `Symbols.csv` or `Symbols.asc` inside Symbols. For existing views, use **Choose Symbols Format** with no pending table edits. Legacy `Symbols.symbols.csv` files remain supported: close Symbols editors and select the current format again to simplify the filename. An existing destination causes the operation to fail instead of overwriting it. There is one canonical symbols file; CSV and ASC are not independently edited in parallel.
 
 `step7project.backup.mode`:
 
-| Значение | Режим |
+| Value | Schedule |
 | --- | --- |
-| `off` | Выключено |
-| `everySave` | Каждое наблюдаемое сохранение, по умолчанию |
-| `1m` | Каждую минуту |
-| `10m` | Каждые 10 минут |
-| `30m` | Каждые 30 минут |
-| `1h` | Каждый час |
+| `off` | Disabled |
+| `everySave` | Every observed save; default |
+| `1m` | Every minute |
+| `10m` | Every 10 minutes |
+| `30m` | Every 30 minutes |
+| `1h` | Every hour |
 
-Сохраняются предыдущие версии изменённых файлов, включая изменения внешними инструментами/ИИ при активном расширении. Быстрые внешние записи watcher может объединить; закрытый VS Code не ведёт историю внешних сохранений. В каждом включённом режиме перед применением создаётся снимок нативного проекта. Выключенный режим не создаёт постоянных автоматических копий.
+Previous file versions are retained, including observed external-tool and AI writes while the extension is active. A filesystem watcher can combine rapid writes; closed VS Code windows do not record external saves. Every enabled mode also snapshots the native project before Apply. Disabled mode creates no persistent automatic backups.
 
-`step7project.backup.directory` задаёт каталог; по умолчанию `.step7project/backups` в рабочем каталоге. Снимки не удаляются автоматически. **Restore Backup to New Folder** восстанавливает копию в новый путь, не поверх открытого проекта.
+`step7project.backup.directory` defaults to `.step7project/backups` inside the view. Snapshots are not pruned automatically. **Restore Backup to New Folder** restores into a new location, preserving the open project.
 
-CSV/ASC содержит имя, адрес, тип и комментарий. Если нативная таблица использует дополнительные атрибуты, которые этот формат не сохраняет (например, WinCC), таблица открывается только для чтения с причиной в `status`. Незавершённые строки можно читать; перед применением нужно заполнить обязательные поля. Неизвестные символы не удаляются автоматически.
+CSV/ASC stores symbol, address, type and comment. A native table with additional attributes that cannot survive this format, such as WinCC metadata, is made read-only with the reason exposed in `status`. Incomplete rows can be read; mandatory fields must be completed before Apply. Unknown symbols are not automatically deleted.
 
-## Работа ИИ
+## AI agent workflow
 
-Каждый экспортированный каталог получает `AGENTS.md` и `step7project.cmd`. Существующий AGENTS.md сохраняется. В исходном репозитории инструкция находится в [AGENTS.md](AGENTS.md), подробные команды — в [docs/AGENT-USAGE.md](docs/AGENT-USAGE.md).
+Each exported view receives `AGENTS.md` and `step7project.cmd`; existing agent instructions are preserved. Repository instructions are in [AGENTS.md](AGENTS.md), with detailed commands in [docs/AGENT-USAGE.md](docs/AGENT-USAGE.md).
 
 ```powershell
 .\step7project.cmd status --workspace . --json
@@ -99,21 +103,21 @@ CSV/ASC содержит имя, адрес, тип и комментарий. �
 .\step7project.cmd apply --workspace . --json
 ```
 
-Манифест `step7project.json` связывает файлы с точными программами и объектами. Служебные базовые версии и резервные копии хранятся в `.step7project`. Сохранение не означает импорт; агент должен отдельно сообщать результат проверки и применения.
+The manifest binds files to exact programs and native objects. Baselines and backups live under `.step7project`. Saving text is separate from native import; agents must report check and apply results separately.
 
-## Надёжность применения
+## Apply reliability
 
-Перед записью плагин проверяет изменения объектов всей затронутой программы, компилирует отдельную COM-копию программы в TEMP-проекте, затем повторяет проверку исходного проекта. Предварительная компиляция использует штатный `S7Program.Copy`; бинарные таблицы проекта не редактируются. После применения результат повторно экспортируется и сравнивается со staging.
+Before writing, the extension checks the affected program inventory, compiles a COM copy of the program in a separate TEMP project, and checks the original project again. Staging uses native `S7Program.Copy`; binary project tables are not edited directly. Applied objects are re-exported and compared with the staged result.
 
-Нативный COM API не обеспечивает общую транзакцию нескольких импортов. При ошибке во время записи плагин сохраняет правки и устанавливает `recovery`, который блокирует дальнейшие применения до проверки оператором. Автоматического отката поверх открытого проекта нет. Состояния и порядок восстановления описаны в инструкции для агентов.
+The native COM API provides no shared transaction across multiple imports. A write failure preserves local edits and sets a durable `recovery` barrier, blocking further Apply operations until operator review. There is no automatic rollback over an open project. States and recovery steps are described in the agent usage guide.
 
-Не меняйте одновременно одну программу в SIMATIC Manager и через плагин. Блокировка Step7Project защищает от другого экземпляра нашего инструмента; она не блокирует редакторы Siemens. Тестовые проекты и журналы остаются в `%TEMP%` для диагностики.
+Avoid editing the same program simultaneously in SIMATIC Manager and the extension. The Step7Project lock excludes another instance of this tool; it does not lock Siemens editors. Test projects and logs remain in `%TEMP%` for diagnostics.
 
-## Сборка и проверка
+## Building and verification
 
-Исходники используемой Toolbox 4.4.10 закреплены в Git-подмодуле `third-party/sources/Toolbox`. Для исследования и последующей работы выполните `git submodule update --init --recursive`. [Лицензии по частям и их нюансы](third-party/Toolbox.COMPONENTS.md). Обычная сборка backend пока использует неизменённый NuGet-пакет той же версии.
+Toolbox source is pinned in the `third-party/sources/Toolbox` Git submodule. Run `git submodule update --init --recursive` for investigation and subsequent source work. See [per-component licenses and nuances](third-party/Toolbox.COMPONENTS.md). Normal backend builds still consume the unmodified NuGet 4.4.10 package.
 
-Требуются Node.js 20+, npm, актуальный .NET SDK с поддержкой сборки `net48`. Reference assemblies восстанавливаются через NuGet; установленный STEP 7 для самой сборки не нужен.
+Requirements: Node.js 20+, npm, and a current .NET SDK capable of building `net48`. NuGet supplies reference assemblies; STEP 7 is not needed for compilation of the extension itself.
 
 ```powershell
 npm ci
@@ -123,38 +127,38 @@ npm run licenses:audit
 npm run package
 ```
 
-`licenses:audit` проверяет инвентарь и показывает открытые вопросы. `package` также выполняет `licenses:check`, который останавливает упаковку при незакрытых лицензионных вопросах. Порядок их устранения и обновления зависимостей описан в [docs/LICENSING.md](docs/LICENSING.md).
+`licenses:audit` verifies the inventory and reports open items. Packaging also runs `licenses:check`, which blocks a release while licensing findings remain open. See [docs/LICENSING.md](docs/LICENSING.md) for dependency maintenance and resolution requirements.
 
-Backend собирается как **x86**, поскольку STEP 7 V5.x Command Interface использует 32-битный интерфейс; см. [Siemens README V5.5 SP4, Command Interface](https://support.industry.siemens.com/cs/attachments/93842005/README.pdf). Основная целевая проверка этого проекта — V5.5 SP3, а не TIA Openness.
+The backend targets **x86** because the STEP 7 V5.x Command Interface is 32-bit; see [Siemens V5.5 SP4 README, Command Interface](https://support.industry.siemens.com/cs/attachments/93842005/README.pdf). The project targets V5.5 SP3, rather than TIA Openness.
 
-Для отладки нажмите F5 — конфигурация Extension Host находится в `.vscode/launch.json`. VM-проверки запускаются `node tools/deploy-test.cjs`, затем `node tools/run-integration.cjs`; они требуют разрешённого SSH alias `vmware-siemens` и создают новые проекты только в TEMP. Не запускайте их на рабочем проекте.
+Press F5 to launch the Extension Host using `.vscode/launch.json`. VM checks use `node tools/deploy-test.cjs` and `node tools/run-integration.cjs`; they require authorization to access SSH alias `vmware-siemens` and create fresh TEMP projects. Do not run them against a working production project.
 
-Сведения о реально выполненных проверках и ограничениях: [docs/VERIFICATION.md](docs/VERIFICATION.md). Устройство backend и первичные источники: [docs/BACKEND.md](docs/BACKEND.md). История изменений: [CHANGELOG.md](CHANGELOG.md).
+Completed checks and limits: [docs/VERIFICATION.md](docs/VERIFICATION.md). Backend architecture and primary references: [docs/BACKEND.md](docs/BACKEND.md). Version history: [CHANGELOG.md](CHANGELOG.md) / [Русский](CHANGELOG.ru.md).
 
-## Структура репозитория
+## Repository and releases
 
-`src` — расширение и CLI, `backend` — x86 COM bridge и офлайн-чтение, `test` — автоматические тесты, `tools` — диагностические и VM-сценарии, `docs` — инструкции. Пользовательские примеры исключены из Git и VSIX. Результаты сборки также не коммитятся; VSIX включает собранные JS и backend-бинарники.
+`src/` contains the extension and CLI; `backend/` the x86 COM bridge and offline reader; `test/` automated tests; `tools/` verification and VM utilities; `docs/` operational guides. User examples and build outputs are excluded from Git. VSIX packages contain compiled JavaScript, the backend and required notices.
 
-`language/interface_*.json` — исходники переводов, `releases/` — результаты упаковки. `npm run package` создаёт каталог и после проверок записывает туда `step7project-<версия>.vsix`.
+`language/interface_*.json` are translation sources. `releases/` holds local build outputs. `npm run package` creates that directory and writes `step7project-<version>.vsix` there after the required checks.
 
-Корневые JSON-файлы выполняют разные задачи:
+The root JSON files serve different purposes:
 
-| Файл | Назначение |
+| File | Purpose |
 | --- | --- |
-| `package.json` | Обязательный манифест расширения: команды, настройки, сборка и заявленные зависимости. Генератор обновляет в нём список встроенных языков и подписи вариантов настроек. |
-| `package-lock.json` | Точные версии и контрольные суммы полного дерева npm-зависимостей для воспроизводимого `npm ci`. Это не копия манифеста. |
-| `package.nls.json`, `package.nls.ru.json` | Сгенерированные словари для команд и настроек, которые читает сам VS Code. Имена и расположение определяются его форматом; редактируемые переводы находятся в `language/`. |
+| `package.json` | Required extension manifest: commands, settings, build commands and declared dependencies. The language generator updates the bundled-language list and settings labels. |
+| `package-lock.json` | Exact npm dependency graph and integrity values for reproducible `npm ci`; distinct from the extension manifest. |
+| `package.nls.json`, `package.nls.ru.json` | Generated dictionaries for commands and settings read by VS Code. Edit their sources in `language/`. |
 
-## Лицензия
+Git tags identify historical source revisions; binaries belong in [GitHub Releases](https://github.com/Svyatogor3757/vscode-step7-project-explorer/releases). See [docs/RELEASING.md](docs/RELEASING.md) for versioning, CI and draft-release handling. Historical release drafts do not imply licensing clearance.
 
-Оригинальный код Step7Project распространяется по [лицензии MIT](LICENSE). Автор — **Cody** ([Svyatogor3757](https://github.com/Svyatogor3757)). При распространении копий или существенных частей кода сохраняйте copyright и полный текст лицензии.
+## License
 
-Сторонние компоненты сохраняют собственные лицензии и авторство: [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Условия поставки и известные нюансы описаны в [docs/LICENSING.md](docs/LICENSING.md).
+Original Step7Project code is licensed under [MIT](LICENSE). Author: **Cody** ([Svyatogor3757](https://github.com/Svyatogor3757)). Retain the copyright and full license text when distributing copies or substantial portions.
 
-## Disclaimer / Товарные знаки и независимость проекта
+Third-party components retain their licenses and authorship: [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Distribution requirements and known nuances are documented in [docs/LICENSING.md](docs/LICENSING.md).
 
-Siemens, SIMATIC и STEP 7 — товарные знаки Siemens AG или её аффилированных компаний. Эти названия используются в проекте исключительно для обозначения совместимости с соответствующими продуктами и технологиями.
+## Disclaimer
 
-Step7Project — независимый проект. Он не связан с Siemens AG, не спонсируется, не одобряется и официально не поддерживается этой компанией. Все права на упомянутые товарные знаки принадлежат соответствующим правообладателям.
+Siemens, SIMATIC and STEP 7 are trademarks of Siemens AG or its affiliates. These names are used solely to identify compatibility with their respective products and technologies.
 
-Siemens, SIMATIC and STEP 7 are trademarks of Siemens AG or its affiliates. These names are used solely to identify compatibility with their respective products and technologies. Step7Project is an independent project and is not affiliated with, sponsored by, endorsed by, or officially supported by Siemens AG. All trademark rights remain with their respective owners.
+Step7Project is an independent project and is not affiliated with, sponsored by, endorsed by, or officially supported by Siemens AG. All trademark rights remain with their respective owners.

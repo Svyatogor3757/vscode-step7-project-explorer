@@ -1,25 +1,27 @@
-# Работа агента с плагином
+# Agent workflow
 
-## Подключение
+**English** | [Русский](AGENT-USAGE.ru.md)
 
-Пользователь выбирает готовый `.s7p` через **Открыть проект** в группе «Управление проектом». Плагин создаёт каталог `<имя>-code` с обычными файлами и добавляет его в workspace. Уже существующее представление можно открыть по `step7project.json`; внутри рабочей области представления обнаруживаются автоматически. Агенту достаточно доступа к каталогу и терминалу на Windows-хосте с STEP 7. При Remote SSH расширение устанавливается на сервер; отдельные SSH-настройки в плагине не нужны.
+## Connect to a project
 
-`project` в JSON может быть относительным к папке манифеста. CLI разрешает его независимо от текущего каталога терминала; `status.project` и `status.workspace` возвращают полные пути. Для существующего представления `configure --workspace . --project-path relative` сохраняет переносимую ссылку, `absolute` — абсолютную. Разные диски требуют абсолютного пути. Индекс обратных связей хранится в пользовательском состоянии расширения и не нужен для передачи папок. Открытие переданного представления обновляет распознанный служебный launcher; пользовательские скрипты и AGENTS.md не перезаписываются.
+The user selects a prepared `.s7p` with **Project Controls → Open Project**. The extension creates a `<name>-code` view containing ordinary files and adds it to the workspace. Existing views can be opened by their `step7project.json`; views inside workspace folders are discovered automatically. An agent needs directory and terminal access on the Windows host with STEP 7. With Remote SSH, install the extension on that host; it needs no separate SSH configuration.
 
-Для нативной записи проект нужно один раз открыть в SIMATIC Manager, чтобы он появился в коллекции Command Interface. Backend выбирает проект по точному пути каталога, а не только по отображаемому имени. При SSH под тем же пользователем должен существовать вошедший Windows-сеанс; desktop bridge использует временную задачу Планировщика заданий. Не нужно передавать пароль или подключать ПЛК.
+The manifest's `project` can be relative to its directory. The CLI resolves it independently of the terminal's current directory; `status.project` and `status.workspace` are absolute. For an existing view, `configure --workspace . --project-path relative` stores a portable reference, while `absolute` stores an absolute path. Different drives require an absolute path. The reverse index is extension user state and is unnecessary when transferring directories. Opening a transferred view rebinds a recognized generated launcher; custom scripts and existing AGENTS.md are preserved.
 
-## Порядок действий
+For native writes, open the project in SIMATIC Manager at least once so it appears in the Command Interface collection. The backend identifies it by exact directory path, rather than its display name alone. Remote SSH writes require a signed-in Windows desktop session for the same user; the desktop bridge uses a temporary scheduled task. No password or PLC connection needs to be supplied.
 
-В экспортированном каталоге:
+## Edit, check and apply
+
+Run these commands in the exported view:
 
 ```powershell
 .\step7project.cmd doctor --json
 .\step7project.cmd status --workspace . --json
 ```
 
-В исходном репозитории тот же CLI запускается как `node bin/step7project.cjs`. Альтернатива для установленного расширения — `node "<extension>/bin/step7project.cjs"`. Параметр `--backend` переопределяет путь к `Step7Bridge.exe`; он должен находиться на том же хосте, где проект и STEP 7.
+From the extension source repository, the same CLI is `node bin/step7project.cjs`. For an installed extension, use `node "<extension>/bin/step7project.cjs"`. `--backend` overrides the path to `Step7Bridge.exe`, on the same host as the project and STEP 7.
 
-Из `status.programs` выбери полный ID CPU-программы. Из `status.changes` возьми путь и состояние файла. Прочитай нужный файл и его зависимости, внеси изменения обычным редактором/patch-инструментом, сохрани UTF-8. Чтобы не ошибиться в пути, пользователь может скопировать его из контекстного меню дерева Step7Project.
+Select the complete CPU-program ID from `status.programs`. Use `status.changes` for the file path and state. Read the file and its dependencies, edit with normal file/patch tools, and save UTF-8. The user can copy an exact file path from the Step7Project tree context menu.
 
 ```powershell
 .\step7project.cmd status --workspace . --json
@@ -28,11 +30,11 @@
 .\step7project.cmd status --workspace . --json
 ```
 
-`check` создаёт отдельный нативный проект и копирует в него затронутые S7-программы через COM `Copy`. Это проверяет все блоки и symbols программы без подключения hardware. `apply` повторяет staging, проверяет внешние изменения, создаёт резервную копию при включённом резервировании, выполняет импорт/компиляцию и сравнивает повторный экспорт с результатом staging. Возвращённый путь `stage` пригоден для диагностики; тестовые каталоги не удаляются автоматически.
+`check` creates a separate native project and uses COM `Copy` to copy the affected S7 programs. It checks their blocks and symbols without connecting hardware. `apply` repeats staging, checks external changes, snapshots the native project if backup is enabled, performs import/compilation, and compares re-export with the staged result. The returned `stage` path supports diagnosis; temporary test directories are not automatically deleted.
 
-CLI выводит JSON и возвращает код 0 при успехе, 1 при ошибке. Параметр `--json` можно передавать явно; формат JSON используется и без него. Нельзя считать успехом наличие части созданных блоков после ошибки.
+The CLI returns JSON and exit code 0 on success or 1 on failure. `--json` is accepted explicitly; JSON is also the default. A subset of newly created blocks after a failure is not a successful apply.
 
-## Создание и удаление
+## Create, rename and delete
 
 ```powershell
 .\step7project.cmd create --workspace . --program "Station\CPU\Program" --type FC --number 901 --language scl
@@ -41,39 +43,39 @@ CLI выводит JSON и возвращает код 0 при успехе, 1 
 .\step7project.cmd delete --workspace . --file "Programs/Station/CPU/Program/Blocks/FC/FC901.Name.awl"
 ```
 
-Поддерживаются типы OB, FC, FB, DB, UDT и языки scl/awl. Допустимость номера для конкретной CPU окончательно проверяет компилятор STEP 7. `create` создаёт исходник; после применения компилятор создаёт блок. Новый ещё не применённый исходник можно отменить через `delete`.
+Supported types are OB, FC, FB, DB and UDT; languages are scl/awl. The STEP 7 compiler validates numbers for the particular CPU. `create` creates a source; applying it compiles a block. An unapplied new source can be cancelled with `delete`.
 
-`rename` меняет имя объекта Sources длиной 1–24 символа, после применения нативные метаданные обновляются через STEP 7. Имя функции/FB внутри текста и ссылки автоматически не переименовываются. DB117.awl нельзя перенумеровать файловым переименованием. Его символьное имя меняется в Symbols, а смена номера требует нового блока и миграции ссылок. Не считай одинаковыми имя файла, имя исходника, номер блока и его символ.
+`rename` changes the Sources object name, with a 1–24 character limit. STEP 7 updates native metadata during Apply. Function/FB identifiers and references inside the text are not automatically renamed. File-renaming DB117.awl does not migrate its block number. Change its symbolic name in Symbols; changing the number requires a new block and reference migration. A filename, source name, block number and symbol are separate identifiers.
 
-Исходник и скомпилированный блок — разные объекты. Удаление исходника оставляет блоки. Для полного удаления явно укажи нужные блоки. Пакет с изменениями Sources и прямыми правками Blocks одной программы отклоняется: применяй эти операции отдельно. Не добавляй файлы вручную в надежде на автоматический импорт — для новых объектов используй `create`.
+Sources and compiled blocks are separate objects. Deleting a source leaves its blocks; explicitly select blocks when removing them too. A batch mixing Sources changes with direct Blocks changes in the same program is rejected; apply these separately. Use `create` for new objects instead of expecting files added manually to be imported automatically.
 
-## Мнемоника и выбранные файлы
+## Mnemonics and selected files
 
-AWL-экспорт должен соответствовать настройке **Options → Customize → Language** в STEP 7. По умолчанию используется английская мнемоника. Для смены без неприменённых правок:
+AWL export must match **STEP 7 → Options → Customize → Language**. English mnemonics are the default. To change them with no pending edits:
 
 ```powershell
 .\step7project.cmd configure --workspace . --mnemonics german
 .\step7project.cmd refresh --workspace .
 ```
 
-Обратный вариант — `english`. Это меняет язык экспорта блоков; существующий текст Sources не переводится. Не меняй язык молча ради обхода ошибки компилятора. `check` и `apply` принимают `--file "Programs/..."` для выбранного объекта; остальные локальные изменения сохраняются. Применение исходника может пересоздать несколько блоков, поэтому конфликты проверяются по всей программе.
+Use `english` to switch back. This changes exported block text; existing Sources text is not translated. Do not silently change the dialect to bypass compiler errors. `check` and `apply` accept `--file "Programs/..."` for a selected object and preserve other local changes. Applying one source may regenerate multiple blocks, so conflict checks cover the affected program.
 
 ## Symbols
 
-CSV: `symbol,address,type,comment`. Используй CSV-парсер, не разбиение по запятой: комментарии могут содержать запятые и кавычки. ASC имеет префикс `126,` и поля шириной 24/12/10/80 символов. Кодировка в рабочем каталоге UTF-8, нативная кодировка хранится в манифесте. Непредставимые символы останавливают импорт. Для VAT поле типа может быть пустым.
+CSV columns are `symbol,address,type,comment`. Use a CSV parser; comments can contain commas and quotes. ASC uses a `126,` prefix and field widths of 24/12/10/80 characters. Project-view text is UTF-8; the native encoding is recorded in the manifest. Unrepresentable characters stop import. VAT symbol entries may have an empty type.
 
 ```powershell
 .\step7project.cmd symbols-format --workspace . --format asc
 .\step7project.cmd symbols-format --workspace . --format csv
 ```
 
-Смена формата допускается только без неприменённых правок таблицы. Настройка `step7project.symbols.editor` выбирает встроенную таблицу, текст или редактор по умолчанию, включая стороннее CSV-расширение.
+Format changes require a clean table with no pending edits. `step7project.symbols.editor` selects the built-in table, text editor or default editor, including third-party CSV extensions.
 
-Новые имена — Symbols.csv/ASC. Старые Symbols.symbols.csv поддерживаются; повторный выбор текущего формата сокращает суффикс, если таблица не изменена и целевой файл не занят. Перед этим закрой её редакторы в VS Code. Не переименовывай управляемый файл вручную: его путь связан с записью в манифесте.
+New files use Symbols.csv/ASC. Legacy Symbols.symbols.csv is supported; reselecting the current format simplifies its suffix when the table is unchanged and the destination is free. Close its VS Code editors first. Do not rename a managed file manually; its path is bound to its manifest entry.
 
-Таблицы с дополнительными нативными атрибутами доступны только для чтения: CSV/ASC не гарантирует их сохранение. Причина указана в `status`. Незавершённые строки экспортируются для просмотра, но импорт требует заполненных обязательных полей. Удалить таблицу целиком нельзя; пустая таблица получается удалением её строк.
+Tables with additional native attributes are read-only because CSV/ASC cannot guarantee their preservation. `status` gives the reason. Incomplete rows are exported for inspection, but import requires mandatory fields. The table object cannot be deleted; remove its rows to create an empty table.
 
-## Копии и ошибки
+## Backups and failures
 
 ```powershell
 .\step7project.cmd configure --workspace . --backup-mode everySave
@@ -81,12 +83,12 @@ CSV: `symbol,address,type,comment`. Используй CSV-парсер, не р
 .\step7project.cmd restore --backup "C:/Backups/..." --destination "C:/Restored/NewProject"
 ```
 
-Режимы: off/everySave/1m/10m/30m/1h. Включённый режим сохраняет предыдущие наблюдаемые версии рабочих файлов и снимок нативного проекта перед применением. История внешних записей требует работающего расширения; watcher может объединять быстрые записи. Снимки не имеют автоматического удаления по возрасту.
+Modes are off/everySave/1m/10m/30m/1h. Enabled modes preserve previously observed project-view file versions and snapshot the native project before Apply. External-write history requires the extension to be running; watchers can combine rapid writes. Snapshots are not automatically pruned by age.
 
-При native-ошибке появляется `recovery`: дальнейшее применение блокируется, рабочие правки сохраняются. Прочитай диагностику, проверь проект в SIMATIC Manager, при необходимости восстанови снимок в новый каталог. После проверки оператор может выполнить `recover --workspace . --acknowledge-native-state`, чтобы подтвердить фактическое состояние. Это не автоматический откат. Блокировку чужого или ещё работающего процесса не снимай.
+A native write failure sets `recovery`, blocks subsequent applies and preserves local edits. Read diagnostics, inspect the project in SIMATIC Manager, and restore a snapshot into a new directory if necessary. After inspection, the operator can use `recover --workspace . --acknowledge-native-state` to acknowledge the actual native state. This does not roll back the project. Do not remove a lock belonging to another or still-running process.
 
-В итоговом сообщении укажи изменённые файлы/блоки, результат check, результат apply, место резервной копии и невыполненные проверки. Успех импорта не означает проверку программы на оборудовании.
+In the final report, list changed files/blocks, Check and Apply results, backup location, and checks not performed. Successful import does not establish correct operation on hardware.
 
-## Основания для формата инструкции
+## Why the workflow uses AGENTS.md
 
-[AGENTS.md](https://agents.md/) описывает предсказуемый файл с контекстом, командами и правилами проекта. [Документация Codex](https://learn.chatgpt.com/docs/agent-configuration/agents-md) объясняет обнаружение инструкций от корня к рабочему каталогу. Поэтому плагин создаёт AGENTS.md именно в корне экспортированных исходников и не перезаписывает существующий файл. Для модели инструкция не заменяет регистрацию tool API; [VS Code Language Model Tools](https://code.visualstudio.com/api/extension-guides/ai/tools) являются отдельным механизмом. Файлы и CLI подходят и для Codex, и для других агентов с доступом к терминалу.
+[AGENTS.md](https://agents.md/) provides a predictable place for project context, commands and rules. [Codex documentation](https://learn.chatgpt.com/docs/agent-configuration/agents-md) explains instruction discovery from the root to the working directory. The extension therefore creates AGENTS.md at the root of exported sources and preserves existing instructions. The document does not register a tool API with a model; [VS Code Language Model Tools](https://code.visualstudio.com/api/extension-guides/ai/tools) are a separate mechanism. Files and CLI work with Codex and other agents that have terminal access.

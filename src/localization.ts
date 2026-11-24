@@ -18,9 +18,15 @@ export async function importLanguage(file:string,directory:string,extensionPath:
  if(path.resolve(file)!==path.resolve(destination))fs.writeFileSync(destination,content);
  return {file:destination,language};
 }
-export function configureLanguage(extensionPath:string,selection='auto',environment='en',customFile=''){
+export function configureLanguage(extensionPath:string,selection='auto',environment='en',customFile='',userDirectory=''){
  const result=catalog.loadCatalog(path.join(extensionPath,'language'));
- active=catalog.selectLanguage(result.languages,selection,environment);
+ const available=[...result.languages];
+ if(userDirectory&&fs.existsSync(userDirectory)){
+  const personal=catalog.loadCatalog(userDirectory,available.find(language=>language.code==='en_us'));
+  result.errors.push(...personal.errors);
+  for(const language of personal.languages)if(!available.some(existing=>existing.code===language.code))available.push(language);
+ }
+ active=catalog.selectLanguage(available,selection,environment);
  if(selection==='custom')try{active=readLanguageFile(customFile,extensionPath);}catch(error){result.errors.push(String(error));}
  return {...result,active:active?.code};
 }

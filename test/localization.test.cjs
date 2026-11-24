@@ -93,3 +93,15 @@ test('languages_invalid_import_does_not_create_saved_translation',async t=>{
  write(file,{name:'Deutsch',vscodeLocale:'de',messages:{'Restored to {0}':'Missing argument'}});
  await assert.rejects(()=>runtime.importLanguage(file,directory,root,async()=>assert.fail('Invalid file must not prompt')),/placeholders/);assert.equal(fs.existsSync(directory),false);
 });
+test('languages_auto_detects_saved_language_and_preserves_explicit_choice',async t=>{
+ const root=fixture(t),runtime=require('../dist/localization'),file=path.join(root,'interface_de_de.json'),directory=path.join(root,'user-language');
+ write(file,{name:'Deutsch',vscodeLocale:'de',messages:{Project:'Projekt'}});await runtime.importLanguage(file,directory,root,async()=>true);
+ assert.equal(runtime.configureLanguage(root,'auto','de-DE','',directory).active,'de_de');assert.equal(runtime.t('Project'),'Projekt');assert.equal(runtime.t('Refresh'),'Refresh');
+ assert.equal(runtime.configureLanguage(root,'auto','fr-FR','',directory).active,'en_us');assert.equal(runtime.t('Project'),'Project');
+ assert.equal(runtime.configureLanguage(root,'en_us','de-DE','',directory).active,'en_us');assert.equal(runtime.t('Project'),'Project');
+ assert.equal(runtime.configureLanguage(root,'ru_ru','de-DE','',directory).active,'ru_ru');assert.equal(runtime.t('Project'),'Проект');
+ assert.equal(runtime.configureLanguage(root,'auto','de-DE','',path.join(root,'absent')).active,'en_us');
+});
+test('generated_agent_guide_is_english_and_preserves_native_write_workflow',()=>{
+ const guide=require('../dist/guidance').agentGuide();assert.match(guide,/^# Working with STEP 7/);assert.match(guide,/Saving text does not apply changes/);assert.match(guide,/\.\\step7project\.cmd check --workspace \. --json/);assert.match(guide,/\.\\step7project\.cmd apply --workspace \. --json/);assert.match(guide,/Do not edit native DBF\/DBT\/MDX/);assert.match(guide,/Preserve an existing AGENTS\.md/);
+});
