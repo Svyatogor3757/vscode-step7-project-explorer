@@ -4,6 +4,8 @@
 
 ## Unreleased
 
+- Added English/Russian contribution guides, README links, CODEOWNERS and a pull-request template. Repository changes use PRs with owner review and CI; the owner can merge their own PR after CI without needing a second account.
+
 ## 0.1.5 – 2026-11-25
 
 - Added an extension-card icon, rasterized at 256×256 from the existing step7.svg. The sidebar keeps the original SVG icon.
