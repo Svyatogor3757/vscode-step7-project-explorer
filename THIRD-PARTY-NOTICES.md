@@ -26,12 +26,14 @@ The extension is compiled with TypeScript **5.9.3**, Copyright Microsoft Corpora
 
 ## Build dependencies and external software
 
-The [inventory](third-party/inventory.json) records every npm lockfile entry, the resolved NuGet packages, source commits where available, original legal-file hashes, and shipped dependency DLL hashes. There are no Git submodules in this repository at the audit date.
+The [inventory](third-party/inventory.json) records every npm lockfile entry, the resolved NuGet packages, source commits where available, original legal-file hashes, and shipped dependency DLL hashes. Toolbox upstream source is now pinned as a Git submodule at `third-party/sources/Toolbox`, commit `f0b2c5a98fe3e1b71861cd47403aac02338efc99`. The complete upstream checkout is excluded from VSIX; the backend still uses NuGet 4.4.10.
 
 `node_modules`, the TypeScript compiler, `@types/*`, `@vscode/vsce` and its dependency tree, and .NET Framework reference-assembly packages are **not distributed in the VSIX**. Installed npm development dependency legal files are retained verbatim in [development/npm-notices.txt](third-party/development/npm-notices.txt) in the source repository; this development-only collection is excluded from VSIX. Uninstalled optional packages for other platforms are identified as metadata-only inspections, not as verified source licenses.
 
 In particular, `@vscode/vsce-sign` and its platform packages have **Microsoft VSCE-SIGN terms**, not MIT. The installed terms restrict use to development/testing with the specified Visual Studio products/services and prohibit redistribution of the signing software. Do not redistribute `node_modules` as part of this product. Other development dependencies use the licenses recorded individually in the inventory, including attribution licenses such as CC-BY-3.0.
 
 VS Code, Node/Electron, Windows, the installed .NET Framework and Siemens STEP 7 are external prerequisites with their own terms. No Siemens or native libnodave binaries, user PLC projects, or example projects are distributed. STEP 7 / SIMATIC / S7 names refer to Siemens products and do not imply Siemens authorship or endorsement. Users must obtain their own required Siemens licenses.
+
+The original DBF code by Brian Duke is identified as **CPOL 1.02** by the [archived original article](https://web.archive.org/web/20220820015622id_/https://www.codeproject.com/Articles/24247/Load-a-DBF-into-a-DataTable) and its linked license page. The [complete CPOL text](third-party/Toolbox.DBF.CPOL-1.02.txt) and [source/archive provenance](third-party/Toolbox.SOURCE.json) are preserved. CPOL rights are not replaced by the library package's MIT declaration or its root LGPL file. See the [per-component license and nuance table](third-party/Toolbox.COMPONENTS.md); compatibility/relicensing remains unconfirmed. The article itself is not republished.
 
 Audit date: **2026-11-24**. Maintenance and redistribution instructions: [docs/LICENSING.md](docs/LICENSING.md).

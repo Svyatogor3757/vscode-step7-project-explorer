@@ -24,6 +24,8 @@ Step7Project — Windows-расширение VS Code для STEP 7 Classic V5.5
 
 ## Если задача касается разработки расширения
 
+Исходная база Toolbox — подмодуль `third-party/sources/Toolbox`, commit `f0b2c5a98fe3e1b71861cd47403aac02338efc99` из NuGet 4.4.10. Инициализируй через `git submodule update --init --recursive`; не обновляй автоматически на master. Лицензии и нюансы конкретных частей: [third-party/Toolbox.COMPONENTS.md](third-party/Toolbox.COMPONENTS.md). Оригинальный DBF-фрагмент имеет CPOL 1.02 по архивному первоисточнику. Не представляй всё дерево как MIT или как однородный LGPL. Backend пока использует NuGet; замена на собственную сборку, локальные patches и смена commit требуют явного описания и проверки. Не включай полный checkout upstream в VSIX: там есть внешние binaries и неиспользуемые upstream-приложения.
+
 - `src/` — TypeScript: дерево, редактор symbols, рабочий каталог, резервирование, CLI.
 - `backend/` — .NET Framework 4.8 x86: чтение через DotNetSiemensPLCToolBoxLibrary и запись через STEP 7 Command Interface. `Invoke-Bridge.ps1` запускает native-компиляторы в интерактивном Windows-сеансе при Remote SSH.
 - `test/` — Node built-in tests; `tools/` — воспроизводимые проверки VM. `Examples/` и оставшийся `S-15/` — игнорируемые пользовательские примеры.

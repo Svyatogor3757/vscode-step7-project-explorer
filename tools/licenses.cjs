@@ -16,7 +16,7 @@ const target = assets.targets['net48/win-x86'] || assets.targets.net48;
 if (!target) throw Error('Restore backend/Step7Bridge.csproj for net48 first.');
 const toolbox = 'DotNetProjects.DotNetSiemensPLCToolBoxLibrary';
 const notices = {
-  [toolbox]: ['Toolbox.LICENSE.txt', 'Toolbox.LGPL-3.0.txt', 'Toolbox.UPSTREAM-README.md', 'Toolbox.source-headers.txt', 'Toolbox.package.nuspec', 'Toolbox.csproj.txt'],
+  [toolbox]: ['Toolbox.LICENSE.txt', 'Toolbox.LGPL-3.0.txt', 'Toolbox.DBF.CPOL-1.02.txt', 'Toolbox.UPSTREAM-README.md', 'Toolbox.source-headers.txt', 'Toolbox.package.nuspec', 'Toolbox.csproj.txt', 'Toolbox.SOURCE.json', 'Toolbox.COMPONENTS.md'],
   SharpZipLib: ['SharpZipLib.LICENSE.txt'],
 };
 const walk = dir => fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
@@ -78,7 +78,7 @@ const inventory = {
   schema: 1, reviewDate: review.reviewDate,
   description: 'Dependency inventory, not a legal clearance or a CycloneDX/SPDX SBOM. Third-party licenses do not change under the root MIT license.',
   packageLockSha256: hash(read('package-lock.json')),
-  nuget, npm,
+  nuget, npm, sourceMaterial: [json('third-party/Toolbox.SOURCE.json')],
   generatedCodeNotices: ['third-party/TypeScript.LICENSE.txt', 'third-party/TypeScript.ThirdPartyNoticeText.txt'].map(file => ({ path: file, sha256: hash(read(file)) })),
 };
 for (const [original, copy] of [['LICENSE.txt', 'TypeScript.LICENSE.txt'], ['ThirdPartyNoticeText.txt', 'TypeScript.ThirdPartyNoticeText.txt']]) {

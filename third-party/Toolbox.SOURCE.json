@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "reviewDate": "2026-11-24",
+  "component": "DotNetProjects.DotNetSiemensPLCToolBoxLibrary",
+  "packageVersion": "4.4.10",
+  "repository": "https://github.com/dotnetprojects/DotNetSiemensPLCToolBoxLibrary.git",
+  "commit": "f0b2c5a98fe3e1b71861cd47403aac02338efc99",
+  "submodule": "third-party/sources/Toolbox",
+  "scope": "Pinned upstream source for investigation and subsequent development; backend still consumes the unmodified NuGet 4.4.10 DLL. Full upstream checkout is excluded from VSIX.",
+  "licenses": {
+    "packageMetadata": "MIT",
+    "repositoryLicense": "LGPL-2.1",
+    "managedFileHeaders": "LGPL-2.0-or-later (named GNU Library General Public License in the headers)",
+    "documentationLicense": "LGPL-3.0",
+    "dbfOriginalArticle": "CPOL-1.02"
+  },
+  "dbfEvidence": {
+    "author": "Brian Duke",
+    "articleCopyrightYear": 2008,
+    "articleTitle": "Load a DBF into a DataTable",
+    "originalArticle": "https://www.codeproject.com/Articles/24247/Load-a-DBF-into-a-DataTable",
+    "archivedArticle": "https://web.archive.org/web/20220820015622id_/https://www.codeproject.com/Articles/24247/Load-a-DBF-into-a-DataTable",
+    "articleHtmlSha256": "684fe46fec51647524c35fd8236252b0a7e7c52d17558e8d5507f2006c1fca57",
+    "originalLicense": "http://www.codeproject.com/info/cpol10.aspx",
+    "archivedLicense": "https://web.archive.org/web/20220820015622id_/http://www.codeproject.com/info/cpol10.aspx",
+    "licenseHtmlSha256": "0600f441739468d4375a36765657bc5caf945713ab4f102b42984da6a0311421",
+    "licenseTextSource": "https://raw.githubusercontent.com/spdx/license-list-data/b8d6af45ad2fcfed61bb85a8ad068aa4a77eadf9/text/CPOL-1.02.txt",
+    "licenseTextSha256": "d69c13067c9fdf52f2b4d9e26478c30821abd7d96bd31968eae78c829f9b1e64",
+    "note": "The archive explicitly identifies the article and associated code/files as CPOL and the linked license page as CPOL 1.02. This does not establish permission to relicense the incorporated code under MIT/LGPL. The article itself is not republished."
+  }
+}

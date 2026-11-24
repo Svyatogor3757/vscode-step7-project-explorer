@@ -1,0 +1,4 @@
+[submodule "toolbox"]
+	path = third-party/sources/Toolbox
+	url = https://github.com/dotnetprojects/DotNetSiemensPLCToolBoxLibrary.git
+	shallow = true

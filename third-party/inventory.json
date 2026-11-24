@@ -40,6 +40,10 @@
           "sha256": "af206196f8fca0fc615b0f64c3678b0312e868153b0c8361d76668154a137fb1"
         },
         {
+          "path": "third-party/Toolbox.DBF.CPOL-1.02.txt",
+          "sha256": "d69c13067c9fdf52f2b4d9e26478c30821abd7d96bd31968eae78c829f9b1e64"
+        },
+        {
           "path": "third-party/Toolbox.UPSTREAM-README.md",
           "sha256": "34d6c4780762876abe54c89e2cbffba9e3d94d36931de54e3874aa12d61b1aa0"
         },
@@ -54,6 +58,14 @@
         {
           "path": "third-party/Toolbox.csproj.txt",
           "sha256": "9dddcf93a172b03605c8904bf84849721365abbf2c96161bba6d8926ddc97068"
+        },
+        {
+          "path": "third-party/Toolbox.SOURCE.json",
+          "sha256": "3ee946f2885a4ec380f33515536b1ae45728109ca8eb1c3873e3cf88df2eeb7b"
+        },
+        {
+          "path": "third-party/Toolbox.COMPONENTS.md",
+          "sha256": "4a09fc6f8c9a3b81ce883a75ceb3dae4e8a5fce6c724a665512adbbd0de36e8c"
         }
       ],
       "review": "unresolved; see release-review.json"
@@ -5679,6 +5691,39 @@
           "sha256": "b303783d5eb7ca50b853ffa5f145e4e7998fab339831d848f507ca6cd970577a"
         }
       ]
+    }
+  ],
+  "sourceMaterial": [
+    {
+      "schema": 1,
+      "reviewDate": "2026-11-24",
+      "component": "DotNetProjects.DotNetSiemensPLCToolBoxLibrary",
+      "packageVersion": "4.4.10",
+      "repository": "https://github.com/dotnetprojects/DotNetSiemensPLCToolBoxLibrary.git",
+      "commit": "f0b2c5a98fe3e1b71861cd47403aac02338efc99",
+      "submodule": "third-party/sources/Toolbox",
+      "scope": "Pinned upstream source for investigation and subsequent development; backend still consumes the unmodified NuGet 4.4.10 DLL. Full upstream checkout is excluded from VSIX.",
+      "licenses": {
+        "packageMetadata": "MIT",
+        "repositoryLicense": "LGPL-2.1",
+        "managedFileHeaders": "LGPL-2.0-or-later (named GNU Library General Public License in the headers)",
+        "documentationLicense": "LGPL-3.0",
+        "dbfOriginalArticle": "CPOL-1.02"
+      },
+      "dbfEvidence": {
+        "author": "Brian Duke",
+        "articleCopyrightYear": 2008,
+        "articleTitle": "Load a DBF into a DataTable",
+        "originalArticle": "https://www.codeproject.com/Articles/24247/Load-a-DBF-into-a-DataTable",
+        "archivedArticle": "https://web.archive.org/web/20220820015622id_/https://www.codeproject.com/Articles/24247/Load-a-DBF-into-a-DataTable",
+        "articleHtmlSha256": "684fe46fec51647524c35fd8236252b0a7e7c52d17558e8d5507f2006c1fca57",
+        "originalLicense": "http://www.codeproject.com/info/cpol10.aspx",
+        "archivedLicense": "https://web.archive.org/web/20220820015622id_/http://www.codeproject.com/info/cpol10.aspx",
+        "licenseHtmlSha256": "0600f441739468d4375a36765657bc5caf945713ab4f102b42984da6a0311421",
+        "licenseTextSource": "https://raw.githubusercontent.com/spdx/license-list-data/b8d6af45ad2fcfed61bb85a8ad068aa4a77eadf9/text/CPOL-1.02.txt",
+        "licenseTextSha256": "d69c13067c9fdf52f2b4d9e26478c30821abd7d96bd31968eae78c829f9b1e64",
+        "note": "The archive explicitly identifies the article and associated code/files as CPOL and the linked license page as CPOL 1.02. This does not establish permission to relicense the incorporated code under MIT/LGPL. The article itself is not republished."
+      }
     }
   ],
   "generatedCodeNotices": [
