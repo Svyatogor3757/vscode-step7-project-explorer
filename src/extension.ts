@@ -10,6 +10,7 @@ import {inside,contains} from './storage';
 import {parseCsv,toCsv,SymbolRow} from './symbols';
 import {ProjectViewIndex,projectKey,rememberProjectViews,findProjectViews} from './projectViews';
 import {refreshLauncher} from './guidance';
+import {ProjectNavigator,NavigationError,PendingNavigation} from './navigation';
 interface Node {label:string;children?:Node[];workspace:Workspace;entry?:Entry;state?:string}
 const config=()=>vscode.workspace.getConfiguration('step7project');
 export class Projects implements vscode.TreeDataProvider<Node>,vscode.Disposable {
@@ -116,6 +117,7 @@ class SymbolsEditor implements vscode.CustomTextEditorProvider {
 export async function activate(context:vscode.ExtensionContext){
  const out=vscode.window.createOutputChannel('Step7Project');
  const report=(e:unknown)=>{const message=e instanceof Error?e.message:String(e);out.appendLine(message);void vscode.window.showErrorMessage('Step7Project: '+message);};
+ const pendingKey='navigation:'+vscode.env.sessionId;
  const backend=new Bridge(config().get<string>('backend.path')||undefined),tree=new Projects(backend,report,context.workspaceState.get<string>('activeProject'));
  const view=vscode.window.createTreeView('step7project.tree',{treeDataProvider:tree,showCollapseAll:true});
  const controlProvider=new ProjectControls(tree),controls=vscode.window.createTreeView('step7project.controls',{treeDataProvider:controlProvider});
@@ -130,6 +132,29 @@ export async function activate(context:vscode.ExtensionContext){
  const readonlyProvider=vscode.workspace.registerTextDocumentContentProvider('step7-readonly',{onDidChange:readonlyChanged.event,provideTextDocumentContent(uri){return fs.readFileSync(uri.query,'utf8');}});
  context.subscriptions.push(readonlyProvider,readonlyChanged,tree.onDidChangeTreeData(()=>{for(const doc of vscode.workspace.textDocuments)if(doc.uri.scheme==='step7-readonly'&&fs.existsSync(doc.uri.query))readonlyChanged.fire(doc.uri);}));
  function register(name:string,action:(...args:any[])=>unknown){context.subscriptions.push(vscode.commands.registerCommand('step7project.'+name,async(...args:any[])=>{try{return await action(...args);}catch(e){report(e);}}));}
+ const workspaceFolders=()=>vscode.workspace.workspaceFolders?.filter(f=>f.uri.scheme==='file').map(f=>f.uri.fsPath)||[];
+ let confirmedFolders=workspaceFolders();
+ const navigator=new ProjectNavigator({
+  folders:()=>confirmedFolders,
+  requiresRestart:()=>!vscode.workspace.workspaceFile,
+  add:folder=>vscode.workspace.updateWorkspaceFolders(confirmedFolders.length,0,{uri:vscode.Uri.file(folder)}),
+  onFoldersChanged:listener=>vscode.workspace.onDidChangeWorkspaceFolders(listener),
+  reveal:async target=>{await vscode.commands.executeCommand('workbench.view.explorer');await vscode.commands.executeCommand('revealInExplorer',vscode.Uri.file(target));},
+  savePending:pending=>Promise.resolve(context.globalState.update(pendingKey,pending))
+ });
+ function navigationFailure(error:unknown){
+  if(error instanceof NavigationError){const messages={missing:'Location does not exist: {0}',folder:'Cannot open this project folder: {0}',rejected:'VS Code could not add the folder: {0}',timeout:'Timed out waiting for the workspace folder: {0}'};return Error(vscode.l10n.t(messages[error.reason],error.location));}return error;
+ }
+ async function navigate(target:string,folder:string,w?:Workspace){
+  if(w)tree.select(w);
+  try{const result=await navigator.open(target,folder,w?.root);if(!result.restarting){await tree.discover();const selected=w&&tree.workspaces.find(x=>projectKey(x.root)===projectKey(w.root));if(selected)tree.select(selected);}return result;}catch(error){
+   throw navigationFailure(error);
+  }
+ }
+ async function resumeNavigation(){
+  const pending=context.globalState.get<PendingNavigation>(pendingKey);
+  try{const result=await navigator.resume(pending);if(result&&pending?.viewRoot){await tree.discover();const w=tree.workspaces.find(x=>projectKey(x.root)===projectKey(pending.viewRoot!));if(w)tree.select(w);}}catch(error){report(navigationFailure(error));}
+ }
  async function chooseProject(){const pick=await vscode.window.showQuickPick(tree.workspaces.map(w=>({label:w.manifest.projectName,description:w.root,w})),{title:vscode.l10n.t('Choose a project')});if(pick)tree.select(pick.w);return pick?.w;}
  async function workspace(n?:Node){if(n?.workspace){tree.select(n.workspace);return n.workspace;}return tree.active||chooseProject();}
  async function open(n:Node,asText=false){
@@ -146,12 +171,12 @@ export async function activate(context:vscode.ExtensionContext){
   await vscode.commands.executeCommand('step7project.controls.focus');
  });
  register('selectProject',chooseProject);
- register('revealNative',(n:Node)=>vscode.commands.executeCommand('revealFileInOS',vscode.Uri.file(n.workspace.manifest.project)));
- register('revealView',(n:Node)=>vscode.commands.executeCommand('revealInExplorer',vscode.Uri.file(n.workspace.root)));
+ register('revealNative',(n:Node)=>navigate(n.workspace.manifest.project,path.dirname(n.workspace.manifest.project),n.workspace));
+ register('revealView',(n:Node)=>navigate(n.workspace.root,n.workspace.root,n.workspace));
  register('copyLocation',(n:ProjectLocation)=>vscode.env.clipboard.writeText(n.location));
  register('copyRelativeLocation',(n:ProjectLocation)=>vscode.env.clipboard.writeText(path.relative(n.root,n.location)||'.'));
  register('revealLocation',(n:ProjectLocation)=>vscode.commands.executeCommand('revealFileInOS',vscode.Uri.file(n.location)));
- register('revealLocationInWorkspace',(n:ProjectLocation)=>vscode.commands.executeCommand('revealInExplorer',vscode.Uri.file(n.location)));
+ register('revealLocationInWorkspace',(n:ProjectLocation)=>navigate(n.location,n.location));
  register('copyPath',(n:Node)=>vscode.env.clipboard.writeText(inside(n.workspace.root,n.entry!.file)));
  register('copyRelativePath',(n:Node)=>vscode.env.clipboard.writeText(n.entry!.file));
  register('reveal',(n:Node)=>vscode.commands.executeCommand('revealFileInOS',vscode.Uri.file(inside(n.workspace.root,n.entry!.file))));
@@ -159,9 +184,8 @@ export async function activate(context:vscode.ExtensionContext){
  async function attach(root:string){
   const w=new Workspace(root,backend);
   const previous=context.globalState.get<ProjectViewIndex>('projectViews',{});await context.globalState.update('projectViews',rememberProjectViews(previous,[{project:w.manifest.project,root:w.root}]));
-  tree.activeRoot=w.root;
-  if(!(vscode.workspace.workspaceFolders||[]).some(f=>contains(f.uri.fsPath,w.root)))vscode.workspace.updateWorkspaceFolders(vscode.workspace.workspaceFolders?.length||0,0,{uri:vscode.Uri.file(w.root)});
-  await tree.discover();tree.select(w);await vscode.commands.executeCommand('step7project.tree.focus');
+  tree.select(w);const result=await navigate(w.root,w.root,w);
+  if(!result?.restarting){await tree.discover();tree.select(w);await vscode.commands.executeCommand('step7project.tree.focus');}
  }
  register('open',async()=>{
   const selected=await vscode.window.showOpenDialog({title:vscode.l10n.t('Open STEP 7 project or step7project.json'),filters:{'STEP 7 / Project View':['s7p','s7l','json']},canSelectMany:false});if(!selected)return;
@@ -215,8 +239,9 @@ export async function activate(context:vscode.ExtensionContext){
  register('restore',async()=>{const backup=await vscode.window.showOpenDialog({title:vscode.l10n.t('Select backup directory'),canSelectFiles:false,canSelectFolders:true});if(!backup)return;const destination=await vscode.window.showSaveDialog({title:vscode.l10n.t('Restore to a NEW path')});if(destination){Backups.restore(backup[0].fsPath,destination.fsPath);void vscode.window.showInformationMessage(vscode.l10n.t('Restored to {0}',destination.fsPath));}});
  const watcher=vscode.workspace.createFileSystemWatcher('**/{step7project.json,Programs/**}');let reload:NodeJS.Timeout|undefined,discoverPending=false;
  const changed=(event?:vscode.Uri|vscode.TextDocument)=>{for(const b of tree.backups.values()){try{b.manifest.backupMode=config().get<BackupMode>('backup.mode','everySave');b.manifest.backupDirectory=config().get('backup.directory','');b.observe();}catch(e){out.appendLine('Backup: '+String(e));}}if(reload)clearTimeout(reload);const uri=event instanceof vscode.Uri?event:event?.uri;if(uri&&path.basename(uri.fsPath)==='step7project.json')discoverPending=true;reload=setTimeout(()=>{if(discoverPending){discoverPending=false;void tree.discover().catch(report);}else tree.reload();},250);};
- context.subscriptions.push(watcher,watcher.onDidChange(changed),watcher.onDidCreate(changed),watcher.onDidDelete(changed),vscode.workspace.onDidSaveTextDocument(changed),vscode.workspace.onDidChangeWorkspaceFolders(()=>{void tree.discover().catch(report);}),vscode.window.onDidChangeActiveTextEditor(editor=>tree.selectFile(editor?.document.uri)),vscode.workspace.onDidChangeConfiguration(e=>{if(e.affectsConfiguration('step7project'))changed();}));
+ context.subscriptions.push(watcher,watcher.onDidChange(changed),watcher.onDidCreate(changed),watcher.onDidDelete(changed),vscode.workspace.onDidSaveTextDocument(changed),vscode.workspace.onDidChangeWorkspaceFolders(()=>{confirmedFolders=workspaceFolders();void tree.discover().catch(report);if(navigator.awaitingRestart)void resumeNavigation();}),vscode.window.onDidChangeActiveTextEditor(editor=>tree.selectFile(editor?.document.uri)),vscode.workspace.onDidChangeConfiguration(e=>{if(e.affectsConfiguration('step7project'))changed();}));
  const timer=setInterval(()=>{for(const b of tree.backups.values()){try{b.observe();}catch(e){out.appendLine('Backup: '+String(e));}}},1000);context.subscriptions.push({dispose(){clearInterval(timer);if(reload)clearTimeout(reload);}});
  await tree.discover();tree.selectFile(vscode.window.activeTextEditor?.document.uri);
- return {cli:path.resolve(context.extensionPath,'bin/step7project.cjs'),getViewState:()=>({project:{title:view.title,message:view.message,visible:view.visible},controls:{title:controls.title,visible:controls.visible}})};
+ await resumeNavigation();
+ return {cli:path.resolve(context.extensionPath,'bin/step7project.cjs'),getViewState:()=>({project:{title:view.title,message:view.message,visible:view.visible},controls:{title:controls.title,visible:controls.visible},activeRoot:tree.active?.root,roots:tree.workspaces.map(w=>w.root)})};
 }

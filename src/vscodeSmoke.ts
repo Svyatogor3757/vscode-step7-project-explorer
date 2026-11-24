@@ -70,6 +70,27 @@ export async function run(){
  for(let i=0;i<50&&document.getText()!=='// Обновлённый интерфейс\n';i++)await new Promise(r=>setTimeout(r,100));
  assert.equal(document.getText(),'// Обновлённый интерфейс\n');console.log('PASS vscode_read_only_view_refreshes_after_export');
  await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+ const initialFolders=vscode.workspace.workspaceFolders!.map(folder=>folder.uri.fsPath),nativeFolder=path.dirname(w.manifest.project);
+ const nativeNavigation=await vscode.commands.executeCommand<{folder:string}>('step7project.revealNative',{workspace:w});
+ assert.equal(nativeNavigation!.folder,nativeFolder);assert(vscode.workspace.workspaceFolders!.some(folder=>folder.uri.fsPath===nativeFolder));assert.deepEqual(vscode.workspace.workspaceFolders!.slice(0,initialFolders.length).map(f=>f.uri.fsPath),initialFolders);
+ const parentNavigation=await vscode.commands.executeCommand<{folder:string}>('step7project.revealView',{workspace:w});assert.equal(parentNavigation!.folder,workspace);
+ assert.equal(api.getViewState().project.visible,false);
+ console.log('PASS vscode_native_and_view_links_open_explorer_and_keep_existing_roots');
+ async function changeFolders(start:number,remove:number,root?:string){await new Promise<void>((resolve,reject)=>{const timer=setTimeout(()=>{subscription.dispose();reject(Error('Workspace change timed out'));},10000),subscription=vscode.workspace.onDidChangeWorkspaceFolders(()=>{clearTimeout(timer);subscription.dispose();resolve();});if(!vscode.workspace.updateWorkspaceFolders(start,remove,...(root?[{uri:vscode.Uri.file(root)}]:[]))){clearTimeout(timer);subscription.dispose();reject(Error('Workspace change rejected'));}});}
+ await changeFolders(vscode.workspace.workspaceFolders!.length,0,w.root);
+ const specificNavigation=await vscode.commands.executeCommand<{folder:string}>('step7project.revealView',{workspace:w});assert.equal(specificNavigation!.folder,w.root);assert.equal(vscode.workspace.getWorkspaceFolder(vscode.Uri.file(w.root))!.uri.fsPath,w.root);
+ console.log('PASS vscode_view_link_reuses_more_specific_workspace_root');
+ await changeFolders(vscode.workspace.workspaceFolders!.findIndex(folder=>folder.uri.fsPath===w.root),1);
+ const parentAgain=await vscode.commands.executeCommand<{folder:string}>('step7project.revealView',{workspace:w});assert.equal(parentAgain!.folder,workspace);assert(api.getViewState().roots.includes(w.root));
+ console.log('PASS vscode_removing_specific_root_keeps_project_under_open_parent');
+ const detachedRoot=path.join(path.dirname(workspace),'detached-code'),detached=new Workspace(detachedRoot,new Bridge());
+ await vscode.commands.executeCommand('step7project.revealView',{workspace:detached});assert.equal(api.getViewState().activeRoot,detachedRoot);
+ const detachedIndex=vscode.workspace.workspaceFolders!.findIndex(folder=>folder.uri.fsPath===detachedRoot);assert(detachedIndex>0);await changeFolders(detachedIndex,1);
+ for(let i=0;i<50&&api.getViewState().roots.includes(detachedRoot);i++)await new Promise(r=>setTimeout(r,100));
+ assert.notEqual(api.getViewState().activeRoot,detachedRoot);assert(!api.getViewState().roots.includes(detachedRoot));assert.deepEqual([...api.getViewState().roots].sort(),[...projects.workspaces.map(w=>w.root)].sort());
+ const restoredNavigation=await vscode.commands.executeCommand<{folder:string}>('step7project.revealView',{workspace:detached});assert.equal(restoredNavigation!.folder,detachedRoot);assert(vscode.workspace.workspaceFolders!.some(folder=>folder.uri.fsPath===detachedRoot));
+ console.log('PASS vscode_removed_view_folder_closes_connection_and_explicit_open_reconnects');
+ await vscode.commands.executeCommand('workbench.action.closeAllEditors');
  controlProvider.dispose();projects.dispose();
- fs.writeFileSync(path.join(workspace,'ui-test-results.json'),JSON.stringify({locale,passed:['vscode_controls_focus_reveals_group_without_project_banner','vscode_discovers_nested_project_views_and_ignores_backups','vscode_generated_launcher_uses_current_extension_host','vscode_localized_controls_are_separate_and_all_actions_are_visible','vscode_active_project_controls_show_native_and_view_locations','vscode_project_location_context_menu_copies_correct_paths','vscode_opens_real_scl_document','vscode_save_creates_previous_version_backup','vscode_opens_symbols_custom_editor','vscode_symbols_open_as_text_uses_same_file','vscode_read_only_document_uses_content_provider','vscode_read_only_view_refreshes_after_export']},null,2));
+ fs.writeFileSync(path.join(workspace,'ui-test-results.json'),JSON.stringify({locale,passed:['vscode_controls_focus_reveals_group_without_project_banner','vscode_discovers_nested_project_views_and_ignores_backups','vscode_generated_launcher_uses_current_extension_host','vscode_localized_controls_are_separate_and_all_actions_are_visible','vscode_active_project_controls_show_native_and_view_locations','vscode_project_location_context_menu_copies_correct_paths','vscode_opens_real_scl_document','vscode_save_creates_previous_version_backup','vscode_opens_symbols_custom_editor','vscode_symbols_open_as_text_uses_same_file','vscode_read_only_document_uses_content_provider','vscode_read_only_view_refreshes_after_export','vscode_native_and_view_links_open_explorer_and_keep_existing_roots','vscode_view_link_reuses_more_specific_workspace_root','vscode_removing_specific_root_keeps_project_under_open_parent','vscode_removed_view_folder_closes_connection_and_explicit_open_reconnects']},null,2));
 }

@@ -1,5 +1,9 @@
 {
   "Open Project": "Открыть проект",
+  "Location does not exist: {0}": "Расположение не существует: {0}",
+  "Cannot open this project folder: {0}": "Не удалось открыть папку проекта: {0}",
+  "VS Code could not add the folder: {0}": "VS Code не удалось добавить папку: {0}",
+  "Timed out waiting for the workspace folder: {0}": "Не удалось дождаться добавления папки в рабочую область: {0}",
   "Project": "Проект",
   "Project Controls": "Управление проектом",
   "Open File": "Открыть файл",

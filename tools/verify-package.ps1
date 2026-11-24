@@ -9,7 +9,7 @@ $paths=@(Get-ChildItem $extension -File -Recurse | ForEach-Object {$_.FullName.S
 foreach($path in $paths) {
  if($path -match '^(Examples|S-15|S15-2026|\.scratch|test|tools|src|node_modules)/|libnodave_|vscodeSmoke|vscodeUpgradeSeed|debug\.log$|\.pdb$|\.map$') {throw ('Unexpected packaged file: '+$path)}
 }
-foreach($required in @('dist/extension.js','dist/cli.js','dist/projectViews.js','package.nls.json','package.nls.ru.json','l10n/bundle.l10n.ru.json','bin/step7project.cjs','backend/bin/Step7Bridge.exe','backend/Invoke-Bridge.ps1','docs/AGENT-USAGE.md','docs/BACKEND.md','docs/VERIFICATION.md','AGENTS.md','THIRD-PARTY-NOTICES.md','third-party/Toolbox.LICENSE.txt')) {
+foreach($required in @('dist/extension.js','dist/cli.js','dist/projectViews.js','dist/navigation.js','package.nls.json','package.nls.ru.json','l10n/bundle.l10n.ru.json','bin/step7project.cjs','backend/bin/Step7Bridge.exe','backend/Invoke-Bridge.ps1','docs/AGENT-USAGE.md','docs/BACKEND.md','docs/VERIFICATION.md','AGENTS.md','THIRD-PARTY-NOTICES.md','third-party/Toolbox.LICENSE.txt')) {
  if(!(Test-Path (Join-Path $extension $required))) {throw ('Missing packaged file: '+$required)}
 }
 $cli=Join-Path $extension 'bin/step7project.cjs'

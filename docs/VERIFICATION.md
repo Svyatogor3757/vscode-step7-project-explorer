@@ -1,5 +1,27 @@
 # Проверки и ограничения
 
+## 0.1.3 — 2026-11-24
+
+Переходы к нативному проекту и представлению объединены: открывается Explorer VS Code, переиспользуется ближайший содержащий корень либо добавляется нужная папка. Остальные папки workspace сохраняются. Отдельная команда контекстного меню продолжает открывать проводник Windows. Существующее закрытие проекта при удалении последней содержащей папки сохранено по уточнению пользователя; удержание проектов вне workspace не вошло в реализацию.
+
+`npm test`: **63 passed, 0 failed, 0 skipped**. Настоящий Extension Host: **16 passed для English и 16 для Russian**; русский сценарий также использовал TEMP-профиль с панелью от 0.1.0. Отчёты: `%TEMP%\SPB-vscode-N8EZqK\projects\ui-test-results.json` и `%TEMP%\SPB-vscode-OqpS1m\projects\ui-test-results.json`. UI-тесты используют сохранённый `.code-workspace`, чтобы последовательные добавления/удаления корней не прерывали тестовый Extension Host переходом между режимами окна.
+
+| Требование | Проверка |
+| --- | --- |
+| Обе ссылки переходят в Explorer и сохраняют существующие корни | `vscode_native_and_view_links_open_explorer_and_keep_existing_roots` |
+| Ближайший корень, включая отдельную вложенную папку | `vscode_view_link_reuses_more_specific_workspace_root`, `navigation_reuses_parent_and_prefers_specific_second_workspace_root` |
+| Удаление вложенного корня при открытом родителе не закрывает проект | `vscode_removing_specific_root_keeps_project_under_open_parent` |
+| Удаление последнего содержащего корня закрывает проект; явное открытие подключает снова | `vscode_removed_view_folder_closes_connection_and_explicit_open_reconnects` |
+| Новая папка добавляется до перехода, параллельные вызовы сериализуются | `navigation_appends_missing_folder_before_reveal_and_serializes_requests` |
+| Нельзя принимать предварительный список папок за подтверждение | `navigation_waits_for_confirmed_workspace_event_not_tentative_folder_list` |
+| Пустое окно / перезапуск хоста и смена режима одной папки | `navigation_empty_workspace_persists_reveal_and_resumes_after_host_restart`, `navigation_single_folder_transition_can_resume_without_restarting_host` |
+| Закрытая или отменённая папка не восстанавливается автоматически | `navigation_does_not_reopen_folder_removed_or_cancelled_before_resume`, `navigation_cancelled_restart_can_be_retried_only_by_new_request` |
+| Ошибки не открывают чужой корень и освобождают ожидания | `navigation_missing_location_or_invalid_parent_keeps_workspace_unchanged`, `navigation_rejected_folder_add_cleans_pending_and_listeners`, `navigation_timeout_does_not_reveal_wrong_workspace_and_cleans_pending`, `navigation_stale_pending_path_is_reported_and_not_reopened` |
+
+В процессе проверки выявлена гонка: VS Code публикует предварительный список workspace folders до подтверждения изменения. Первый вариант helper завершал ожидание слишком рано; новый регрессионный тест падал на раннем reveal, после исправления прошёл. Адаптер использует подтверждённый список и событие изменения, а не только немедленное чтение workspaceFolders. Первичные основания: [extHostWorkspace](https://github.com/microsoft/vscode/blob/main/src/vs/workbench/api/common/extHostWorkspace.ts) и [переход между режимами workspace](https://github.com/microsoft/vscode/blob/main/src/vs/workbench/services/workspaces/browser/abstractWorkspaceEditingService.ts).
+
+Пустое окно и переход из режима одной папки проверены через имитацию перезапуска и подтверждения workspace в unit-тестах, а не полным GUI-тестом остановки Extension Host. В GUI проверены реальные добавления/удаления корней сохранённого workspace. Незавершённый переход хранится только в пользовательском состоянии текущей сессии; при старте он не добавляет отсутствующий корень повторно. Файлы примеров и пользовательские представления не менялись. Backend и нативные форматы записи не изменялись, новые циклы записи STEP 7 на VM не запускались.
+
 ## 0.1.2 — 2026-11-23
 
 Убрана постоянная инструкция над деревом; добавлена команда показа управления и явные локализованные заголовки групп. Пользователь подтвердил, что отсутствие новых групп после установки поверх старой версии устранилось перезапуском окна. Своего уведомления с перезапуском расширение не добавляет.

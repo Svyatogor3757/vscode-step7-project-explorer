@@ -10,15 +10,17 @@ const {Workspace}=require('../dist/workspace'),{toAsc}=require('../dist/symbols'
  const second=path.join(temp,'second-native');fs.mkdirSync(second);const secondProject=path.join(second,'second.s7p');fs.writeFileSync(secondProject,'Second fixture');
  await Workspace.open(secondProject,path.join(workspace,'views','second-code'),{read:async()=>({...snapshot,name:'Second project'})});
  await Workspace.open(project,path.join(workspace,'.step7project','hidden-code'),backend);
+ await Workspace.open(project,path.join(temp,'detached-code'),{read:async()=>({...snapshot,name:'Detached project'})});
  const root=path.resolve(__dirname,'..');console.log('VSCODE_TEST_ROOT='+temp);
  const locale=process.argv.includes('--ru')?'ru':'en';
+ const workspaceFile=path.join(temp,'ui.code-workspace');fs.writeFileSync(workspaceFile,JSON.stringify({folders:[{path:workspace}]}));
  if(locale==='ru'){
   const registered=path.join(process.env.APPDATA,'Code','languagepacks.json');
   if(!fs.existsSync(registered))throw Error('Install the VS Code Russian language pack before running --ru');
   const packs=JSON.parse(fs.readFileSync(registered,'utf8'));if(!packs.ru)throw Error('Russian language pack is not registered');
   fs.mkdirSync(path.join(temp,'profile'),{recursive:true});fs.writeFileSync(path.join(temp,'profile','languagepacks.json'),JSON.stringify({ru:packs.ru}));
  }
- const args=['-NoProfile','-ExecutionPolicy','Bypass','-File',path.join(root,'tools/run-vscode.ps1'),'-CodePath','C:/Program Files/Microsoft VS Code/Code.exe','-WorkspacePath',workspace,'-TestsPath',path.join(root,'dist/vscodeSmoke.js'),'-ExtensionPath',root,'-UserData',path.join(temp,'profile'),'-Locale',locale];
+ const args=['-NoProfile','-ExecutionPolicy','Bypass','-File',path.join(root,'tools/run-vscode.ps1'),'-CodePath','C:/Program Files/Microsoft VS Code/Code.exe','-WorkspacePath',workspaceFile,'-TestsPath',path.join(root,'dist/vscodeSmoke.js'),'-ExtensionPath',root,'-UserData',path.join(temp,'profile'),'-Locale',locale];
  const env={...process.env,STEP7PROJECT_TEST_LOCALE:locale};delete env.ELECTRON_RUN_AS_NODE;
  if(process.argv.includes('--upgrade')){
   const oldPackage=process.env.STEP7PROJECT_UPGRADE_VSIX||path.join(root,'step7project-0.1.0.vsix'),destination=path.join(temp,'original-extension');

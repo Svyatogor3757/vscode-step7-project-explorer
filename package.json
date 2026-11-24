@@ -2,7 +2,7 @@
   "name": "step7project",
   "displayName": "Step7Project",
   "description": "%extension.description%",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "publisher": "step7project",
   "license": "MIT",
   "engines": {
