@@ -1,5 +1,15 @@
 # Проверки и ограничения
 
+## README, имя проводника и исправление hosted CI — 2026-11-24 (Unreleased)
+
+Оба README теперь начинаются с описания отдельного редактируемого представления оригинального проекта, области Sources/Symbols/Blocks и ограничений записи. Быстрый старт указывает два последовательных выбора: исходный `.s7p`, затем родительскую папку для автоматически создаваемого `<project-name>-code`. Добавлен обзор функций; подробные разделы сохранены. Название `Step 7 Project Explorer` одинаково в English и Russian. Относительные ссылки и переключатели обоих языков прошли проверку.
+
+Первый [GitHub CI на 2271fc7](https://github.com/Svyatogor3757/vscode-step7-project-explorer/actions/runs/45382481830) собрал backend, но завершился ошибкой тестов: Windows PowerShell наследовал через Node `PSModulePath` от PowerShell 7, из-за чего не загружался `Get-FileHash`; x86-проверка metadata также превысила timeout. Такое наследование описано в [Microsoft about_PSModulePath](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_psmodulepath?view=powershell-7.5). Исправление удаляет только эту переменную из окружения дочернего Windows PowerShell; прямой запуск backend сохраняет окружение. Таймауты не увеличены.
+
+После исправления: `npm test` — **90/90**, exit 0; запуск backend/package/environment-тестов из PowerShell 7 через `-File` — **8/8**, exit 0. Тесты `legacy_powershell_environment_removes_module_paths_without_mutating_parent` и `bridge_sanitizes_only_legacy_powershell_children` проверяют регистр имени переменной, сохранность остальных значений, неизменность родителя и различие PowerShell/прямого EXE. Повторные English/Russian Extension Host проверки — **18/18** в каждом языке, включая английский заголовок контейнера. Нативные STEP 7 импорты и PLC в этой правке не выполнялись.
+
+В origin отправлены полная история и теги `v0.1.0`–`v0.1.3` на исходных коммитах, перечисленных в [RELEASE-ARCHIVE.json](RELEASE-ARCHIVE.json). Созданы четыре черновика GitHub Releases: в каждом исходный VSIX и `SHA256SUMS.txt`; размеры и SHA-256 загруженных assets проверены по GitHub API. Публичная публикация бинарников и новая упаковка сохраняют блокировку до завершения лицензионного review согласно AGENTS.md.
+
 ## Подготовка GitHub, документация и выбор языка — 2026-11-24 (Unreleased)
 
 README и CHANGELOG теперь английские по умолчанию с русскими файлами и взаимными переключателями. AGENTS.md — один английский набор правил, включая сопровождение обеих версий, английские пользовательские документы и допустимые русские технические журналы. AGENT-USAGE.md, language/README.md и вновь генерируемый AGENTS.md экспортированного проекта — английские; русские руководства сохранены. Существующий пользовательский AGENTS.md по-прежнему не перезаписывается. Относительные ссылки и переключатели проверены для 11 основных документов.

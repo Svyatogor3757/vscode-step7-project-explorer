@@ -1,4 +1,5 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),{spawnSync}=require('node:child_process');
+const {windowsPowerShellEnvironment}=require('../dist/processEnvironment');
 // Private ZIP fixtures, not installable VSIX releases. No release gate is bypassed.
 function fixture(t){
  const root=fs.mkdtempSync(path.join(os.tmpdir(),'SPB-package-check-')),extension=path.join(root,'content','extension');
@@ -10,8 +11,8 @@ function fixture(t){
 function run(fixture){
  const ps=path.join(process.env.SystemRoot,'System32','WindowsPowerShell','v1.0','powershell.exe'),zip=path.join(fixture.root,'fixture.zip'),compress=path.join(fixture.root,'compress.ps1');
  fs.writeFileSync(compress,"param($Root,$Zip)\nAdd-Type -AssemblyName System.IO.Compression.FileSystem\n[IO.Compression.ZipFile]::CreateFromDirectory($Root,$Zip)\n");
- const packed=spawnSync(ps,['-NoProfile','-File',compress,'-Root',path.join(fixture.root,'content'),'-Zip',zip],{encoding:'utf8',timeout:30000});assert.equal(packed.status,0,packed.stderr);
- const checked=spawnSync(ps,['-NoProfile','-ExecutionPolicy','Bypass','-File',path.resolve('tools/verify-package.ps1'),'-Package',zip,'-SkipExample'],{encoding:'utf8',timeout:45000});
+ const packed=spawnSync(ps,['-NoProfile','-File',compress,'-Root',path.join(fixture.root,'content'),'-Zip',zip],{encoding:'utf8',timeout:30000,env:windowsPowerShellEnvironment()});assert.equal(packed.status,0,packed.stderr);
+ const checked=spawnSync(ps,['-NoProfile','-ExecutionPolicy','Bypass','-File',path.resolve('tools/verify-package.ps1'),'-Package',zip,'-SkipExample'],{encoding:'utf8',timeout:45000,env:windowsPowerShellEnvironment()});
  return {code:checked.status,output:checked.stdout+checked.stderr};
 }
 test('packaged_archive_accepts_matching_runtime_and_legal_inventory',{skip:process.platform!=='win32'},t=>{const result=run(fixture(t));assert.equal(result.code,0,result.output);assert.match(result.output,/PASS packaged_manifest_and_license_inventory/);assert.match(result.output,/PASS packaged_backend_doctor/);assert.match(result.output,/SKIP user_example_offline_export/);});

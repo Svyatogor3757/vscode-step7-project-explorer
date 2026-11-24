@@ -3,7 +3,7 @@
   "vscodeLocale": "ru",
   "manifest": {
     "extension.description": "Проводник и редактор проектов STEP 7 Classic для Windows.",
-    "view.explorer": "Проводник Step 7 проекта",
+    "view.explorer": "Step 7 Project Explorer",
     "view.controls": "Управление проектом",
     "view.project": "Проект",
     "editor.symbols": "Символы STEP 7",

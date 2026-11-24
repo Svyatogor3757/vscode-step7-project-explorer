@@ -2,18 +2,39 @@
 
 **English** | [Русский](README.ru.md)
 
-A **STEP 7 Classic V5.5 SP3 / S7-300** project browser and editor for VS Code on Windows. The Step7Project sidebar displays programs from different CPUs, SCL/AWL sources, blocks and symbol tables. Users and AI agents work with ordinary UTF-8 files.
+Step7Project is a VS Code extension that creates an **editable project view of an existing STEP 7 Classic project**. The view is a separate directory containing source code, symbol tables and block representations as ordinary UTF-8 files. You can read and edit those files, save changes, then check and apply them to the original project through STEP 7.
 
-Created by **Cody** ([Svyatogor3757](https://github.com/Svyatogor3757)). Original project code is available under [MIT](LICENSE), allowing modification and commercial use while retaining the copyright and license text. Dependencies retain their own terms: [third-party notices](THIRD-PARTY-NOTICES.md), [licensing review](docs/LICENSING.md).
+The extension works with **Sources, Symbols and Blocks** for **STEP 7 V5.5 SP3 / S7-300 on Windows**. Some blocks and symbol tables are read-only; the tree and CLI show why. Hardware configuration, NetPro, connections and PLC downloads remain in STEP 7.
 
-**Distribution status:** the 2026-11-24 audit identified conflicting MIT/LGPL notices in Toolbox 4.4.10 and separate CPOL 1.02 terms for its incorporated DBF code. Release packaging is blocked until the [three review items](third-party/release-review.json) are resolved. Local compilation and tests remain available. Historical VSIX files are not cleared for redistribution by this audit. GitHub release drafts preserve those historical builds for maintainer review.
+AI agents can work with the same files and CLI. Copy a path from the tree, give it to Codex or another terminal-capable agent, and use the generated AGENTS.md for the check/apply workflow.
 
-## Installation and first steps
+## Quick start
 
-1. Build outputs belong in `releases/`, for example `releases/step7project-0.1.3.vsix`. Install with **Extensions → … → Install from VSIX**. After updating an existing installation, run **Developer: Reload Window** from the command palette so VS Code reloads the registered views and commands. Changes listed under Unreleased are currently in source; a new binary release remains blocked by the Toolbox review.
-2. In **Project Controls → Open Project**, select a native `.s7p` and the parent directory for a new `<name>-code` project view. For an existing view, select its `step7project.json`; known views reconnect without another export.
-3. Open a source in the Step7Project sidebar, edit and save. Use the context menu to copy a file path for an AI agent.
-4. Run **Check Changes**, then **Apply Changes**. Saving text updates the project view; Apply is the separate operation that writes the native STEP 7 project.
+Install a VSIX using **Extensions → … → Install from VSIX**, then open **Step 7 Project Explorer**. Local packages are kept in `releases/`; historical GitHub builds are currently drafts pending the [licensing review](docs/LICENSING.md). Unreleased changes described here are in the current source tree. After updating an installation, run **Developer: Reload Window**.
+
+1. In **Project Controls**, choose **Open Project** and select the original STEP 7 project file, for example `D:\PLC\Plant\Plant.s7p`.
+2. In the next dialog, select the **folder in which to store the project view**. The extension creates `<project-name>-code` inside it. For example, selecting `D:\Code` creates `D:\Code\Plant-code`. This is the editable view directory, separate from the original project.
+3. Open a file under **Sources**, **Symbols** or **Blocks**, edit it and save. Read-only objects remain available for inspection.
+4. Run **Check Changes** to compile the edits on a temporary copy. Review the result, then use **Apply Changes** to write them back to the original STEP 7 project. Saving a view file alone does not write the original project.
+
+To reconnect an existing view, choose its `step7project.json` instead of creating another export. Views inside open workspace folders are also detected automatically. Native import and compilation require a licensed STEP 7 installation with the relevant language packages; offline reading does not.
+
+## Features
+
+| Task | Available actions |
+| --- | --- |
+| Browse a project | View Sources, Symbols and Blocks for each CPU/program; switch between multiple connected views. |
+| Edit code and data | Edit supported SCL/AWL sources and writable AWL representations of blocks, DBs and UDTs. Unsupported or protected objects stay read-only. |
+| Create and remove objects | Create OB/FC/FB/DB/UDT source templates, including instance DBs; rename Sources objects and explicitly mark sources or blocks for deletion. |
+| Work with symbols | Use the built-in table, a text editor or a third-party CSV editor. Switch the canonical table between CSV and ASC. |
+| Review changes | Show a diff against the exported baseline, check compilation on a copy, then apply with conflict detection and re-export verification. |
+| Refresh from STEP 7 | Reread the native project while preserving local edits and reporting conflicts. |
+| Keep backups | Choose a backup schedule, inspect previous file versions, and restore a snapshot into a new directory. |
+| Work with an AI agent | Use real file paths, generated instructions and CLI commands for status, checks, creation, rename, deletion and Apply. |
+| Reopen or move a view | Open step7project.json, reuse known views and store relative native-project paths when possible. |
+| Choose a language | Follow the VS Code language, select English/Russian, or import a partial personal translation with English fallback. The Step 7 Project Explorer name stays English. |
+| Use Remote SSH | Run the extension and backend on the Windows host containing STEP 7 and the project. |
+
 
 ## Explorer, active projects and portability
 

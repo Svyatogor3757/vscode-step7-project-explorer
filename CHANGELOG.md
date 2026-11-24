@@ -4,6 +4,9 @@
 
 ## Unreleased
 
+- Reworked both README openings around the editable view of an original STEP 7 project, a quick start with explicit view-folder placement, and a feature overview. Kept the Step 7 Project Explorer name in English across interface languages.
+- Fixed Windows PowerShell child environments inherited through Node from PowerShell 7, preventing legacy module-autoload failures in the native bridge and test harnesses.
+
 - Added English-default and Russian README/changelog files with language links. Agent instructions remain a single English AGENTS.md to avoid conflicting copies.
 - Made the agent usage guide, translation guide and generated project AGENTS.md English by default, retaining Russian guide companions. Automatic selection includes saved personal translations, falls back to English for unsupported locales, and preserves explicit choices.
 - Added version-tag and draft-release automation with Windows build/test checks, VSIX verification and SHA-256 checksums. Release packaging remains subject to the Toolbox licensing review.

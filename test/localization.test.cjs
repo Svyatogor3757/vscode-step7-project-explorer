@@ -10,7 +10,7 @@ test('localization_covers_manifest_and_runtime_strings_with_matching_parameters'
  for(const [,key] of JSON.stringify(p).matchAll(/%([^%]+)%/g)){assert.equal(typeof en[key],'string',key);assert.equal(typeof ru[key],'string',key);assert.notEqual(ru[key],undefined);}
  const source=ts.createSourceFile('extension.ts',fs.readFileSync('src/extension.ts','utf8'),ts.ScriptTarget.Latest,true);
  function walk(node){if(ts.isCallExpression(node)&&node.expression.getText(source)==='i18n.t'&&node.arguments[0]&&ts.isStringLiteral(node.arguments[0])){const key=node.arguments[0].text;assert.equal(typeof bundle[key],'string',key);assert.equal(typeof english[key],'string',key);assert.deepEqual([...bundle[key].matchAll(/\{\w+\}/g)].map(m=>m[0]).sort(),[...key.matchAll(/\{\w+\}/g)].map(m=>m[0]).sort(),key);}ts.forEachChild(node,walk);}walk(source);
- assert.equal(en['command.open'],'Open Project');assert.equal(ru['command.open'],'Открыть проект');assert.equal(ru['view.explorer'],'Проводник Step 7 проекта');
+ assert.equal(en['command.open'],'Open Project');assert.equal(ru['command.open'],'Открыть проект');assert.equal(en['view.explorer'],'Step 7 Project Explorer');assert.equal(ru['view.explorer'],'Step 7 Project Explorer');
  for(const command of ['copyLocation','copyRelativeLocation','revealLocation']){
   const menu=p.contributes.menus['view/item/context'].find(item=>item.command==='step7project.'+command),pattern=/viewItem =~ \/(.+)\//.exec(menu.when);assert(pattern,command);
   const regex=new RegExp(pattern[1]);assert(regex.test('location.native'),command);assert(regex.test('location.view'),command);assert(!regex.test('file'),command);

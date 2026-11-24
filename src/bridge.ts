@@ -1,5 +1,6 @@
 import {spawn} from 'node:child_process';
 import path from 'node:path';
+import {windowsPowerShellEnvironment} from './processEnvironment';
 import {Backend,Snapshot,Operation,Mnemonics} from './model';
 export class Bridge implements Backend {
   constructor(readonly executable=process.env.STEP7PROJECT_BACKEND||path.resolve(__dirname,'../backend/bin/Step7Bridge.exe'),readonly mnemonics:Mnemonics='english'){}
@@ -10,7 +11,7 @@ export class Bridge implements Backend {
       const native=['execute','stage'].includes((request as {command:string}).command);
       const exe=native?'powershell.exe':this.executable;
       const args=native?['-NoProfile','-ExecutionPolicy','Bypass','-File',path.resolve(__dirname,'../backend/Invoke-Bridge.ps1'),'-BridgePath',this.executable]:[];
-      const child=spawn(exe,args,{windowsHide:true,stdio:['pipe','pipe','pipe']});let out='',err='';let settled=false;
+      const child=spawn(exe,args,{windowsHide:true,stdio:['pipe','pipe','pipe'],env:native?windowsPowerShellEnvironment():process.env});let out='',err='';let settled=false;
       // Do not kill a compiler on a timeout: native mutation may still be in progress.
       child.stdout.setEncoding('utf8').on('data',s=>out+=s);child.stderr.setEncoding('utf8').on('data',s=>err+=s);
       child.on('error',e=>{settled=true;reject(Error(`Cannot start STEP 7 backend: ${e.message}`));});
