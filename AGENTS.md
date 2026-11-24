@@ -1,8 +1,8 @@
-# Step7Project: instructions for AI agents
+# Step7ProjectExplorer: instructions for AI agents
 
 ## Using the tool
 
-Step7Project is a Windows VS Code extension for STEP 7 Classic V5.5 SP3 / S7-300. An agent's primary interface is the exported project view's ordinary UTF-8 files and CLI. No model-specific integration is required.
+Step7ProjectExplorer is a Windows VS Code extension for STEP 7 Classic V5.5 SP3 / S7-300. An agent's primary interface is the exported project view's ordinary UTF-8 files and CLI. No model-specific integration is required.
 
 For PLC program work, use the connected directory containing `step7project.json`, rather than this extension's source repository. Read that directory's local `AGENTS.md`. Paths copied from the tree are ordinary file paths; use standard file-reading/editing tools. The generated `step7project.cmd` invokes the installed CLI with a suitable Node/Electron runtime.
 
@@ -46,6 +46,12 @@ Preserve exact native identifiers, encodings and CPU boundaries. Never report su
 User-facing documentation defaults to English. Keep [README.md](README.md) and [README.ru.md](README.ru.md) aligned, including their English/Russian navigation links. Document every user-facing change in both [CHANGELOG.md](CHANGELOG.md) and [CHANGELOG.ru.md](CHANGELOG.ru.md). [docs/AGENT-USAGE.md](docs/AGENT-USAGE.md) must be English; maintain its Russian companion when changing the workflow. Internal developer references and the single verification journal under `docs/` may remain Russian. Keep AGENTS.md as one English instruction set to avoid conflicting language copies.
 
 For interface localization, automatic mode follows the detected VS Code display language when a matching bundled or imported language is available; otherwise it falls back to English. Preserve explicit user choices. Cover unsupported locales and partial-translation fallback when changing this behavior.
+
+## Contributions and protected main
+
+Use a separate branch and pull request for repository changes; do not push directly to main. Follow [CONTRIBUTING.md](CONTRIBUTING.md) and its Russian companion. The owner reviews outside contributions through CODEOWNERS. Do not approve or merge another contributor's PR without an explicit instruction from the user.
+
+The owner has a PR-only review bypass for their own PRs because authors cannot self-approve. The separate history/CI ruleset has no bypass: wait for the GitHub Actions `windows` check, keep the PR current with main, and preserve the force-push/deletion barriers. Do not weaken rules to finish a task. If the CI job name changes, update the required-check configuration deliberately. Details: [docs/CONTRIBUTION-MAINTENANCE.md](docs/CONTRIBUTION-MAINTENANCE.md).
 
 ## Licensing and releases
 

@@ -7,7 +7,7 @@
 ![VS Code 1.95+](https://img.shields.io/badge/VS_Code-1.95%2B-blue)
 ![Windows](https://img.shields.io/badge/platform-Windows-blue)
 
-[Быстрый старт](#быстрый-старт) · [Для ИИ-агентов](docs/AGENT-USAGE.ru.md) · [Релизы](https://github.com/Svyatogor3757/vscode-step7-project-explorer/releases) · [Сообщить об ошибке](https://github.com/Svyatogor3757/vscode-step7-project-explorer/issues)
+[Быстрый старт](#быстрый-старт) · [Для ИИ-агентов](docs/AGENT-USAGE.ru.md) · [Релизы](https://github.com/Svyatogor3757/vscode-step7-project-explorer/releases) · [Сообщить об ошибке](https://github.com/Svyatogor3757/vscode-step7-project-explorer/issues) · [Участие в разработке](CONTRIBUTING.ru.md)
 
 Step7ProjectExplorer – **плагин VS Code для редактирования кода проектов STEP 7 Classic**. Исходники, блоки и символы доступны в одной рабочей области: можно искать код и ссылки, редактировать несколько файлов и сравнивать изменения через Git.
 
@@ -186,6 +186,10 @@ Backend собирается как **x86**, поскольку STEP 7 V5.x Comm
 | `package.json` | Обязательный манифест расширения: команды, настройки, сборка и заявленные зависимости. Генератор обновляет в нём список встроенных языков и подписи вариантов настроек. |
 | `package-lock.json` | Точные версии и контрольные суммы полного дерева npm-зависимостей для воспроизводимого `npm ci`. Это не копия манифеста. |
 | `package.nls.json`, `package.nls.ru.json` | Сгенерированные словари для команд и настроек, которые читает сам VS Code. Имена и расположение определяются его форматом; редактируемые переводы находятся в `language/`. |
+
+## Участие в разработке
+
+Предлагайте изменения через fork и pull request. Владелец проверяет предложения и решает, что сливать в `main`; само открытие PR основной код не меняет. Порядок работы, проверки и правила ревью описаны в [CONTRIBUTING.ru.md](CONTRIBUTING.ru.md).
 
 ## Лицензия
 

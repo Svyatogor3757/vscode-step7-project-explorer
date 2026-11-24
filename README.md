@@ -7,7 +7,7 @@
 ![VS Code 1.95+](https://img.shields.io/badge/VS_Code-1.95%2B-blue)
 ![Windows](https://img.shields.io/badge/platform-Windows-blue)
 
-[Quick start](#quick-start) · [Agent guide](docs/AGENT-USAGE.md) · [Releases](https://github.com/Svyatogor3757/vscode-step7-project-explorer/releases) · [Report a bug](https://github.com/Svyatogor3757/vscode-step7-project-explorer/issues)
+[Quick start](#quick-start) · [Agent guide](docs/AGENT-USAGE.md) · [Releases](https://github.com/Svyatogor3757/vscode-step7-project-explorer/releases) · [Report a bug](https://github.com/Svyatogor3757/vscode-step7-project-explorer/issues) · [Contributing](CONTRIBUTING.md)
 
 Step7ProjectExplorer is a **VS Code extension for editing STEP 7 Classic project code**. Sources, blocks and symbols share one workspace: search code and references, edit multiple files and compare changes with Git.
 
@@ -184,6 +184,10 @@ The root JSON files serve different purposes:
 | `package.nls.json`, `package.nls.ru.json` | Generated dictionaries for commands and settings read by VS Code. Edit their sources in `language/`. |
 
 Git tags identify historical source revisions; binaries belong in [GitHub Releases](https://github.com/Svyatogor3757/vscode-step7-project-explorer/releases). See [docs/RELEASING.md](docs/RELEASING.md) for versioning, CI and draft-release handling. Historical release drafts do not imply licensing clearance.
+
+## Contributing
+
+Propose changes through a fork and pull request. The repository owner reviews contributions and decides what to merge into `main`; opening a PR does not change the main codebase. See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow, checks and review policy.
 
 ## License
 
